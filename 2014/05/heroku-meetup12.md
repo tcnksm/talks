@@ -1,9 +1,8 @@
-Heroku Meetup #12
+
+Deploy Go Web Application to Heroku
 ====
 
-http://herokujp.doorkeeper.jp/events/10902
-
-# Deploy Go Web Application through wercker
+at [Heroku Meetup #12](http://herokujp.doorkeeper.jp/events/10902)
 
 # TL;DR
 
@@ -99,7 +98,7 @@ $ git push heroku master
 - テストが通ったらHerokuにデプロイするようにする
     - HerokuのApp KeyとApplicationを登録
     - 以下を追記
-    
+
 ```bash
 deploy:
   steps:
@@ -142,5 +141,4 @@ $ docker run -d -p 3000 -e "PORT=3000" tcnksm/martini:latest
 - Go Web ApplicationをHerokuにdeploy
 - Front系よりHTTP APIサービスの構築に使えそう
     - e.g., logspout（Dockerコンテナ用のlogルーティングツール）
--     
-
+-
