@@ -1,11 +1,13 @@
-Flynn
+The Age of Flynn
 ====
 
 at [Docker meetup Tokyo #3](http://connpass.com/event/6998/)
 
 ## Introduction
 
-## I build tool
+- [SOTA](http://deeeet.com/writing/)
+
+###  I build tool
 
 - [tcnksm/dmux]() - docker + tmux = dmux
 - [tcnksm/rbdock]() - Generate Dockerfile for Ruby or Rails, Sinatra
@@ -14,43 +16,53 @@ at [Docker meetup Tokyo #3](http://connpass.com/event/6998/)
 
 ## はじめに
 
-ワタシハDockerノカジュアルユーザデス
-
 - 本職はアプリケーションエンジニア
 - Dockerは個人的に家で触って遊んでいる
-- カジュアルユーザの立場から
+- カジュアルユーザの立場から話す
 
-## 前提
+### 前提
 
 - Dockerの詳しい話はしない
 - Dockerがどのようにうごくか分かっていることを前提とする
 
 ## TL;DR
 
-OSSのPaaSであるFlynnの紹介
-
 Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFlynnの紹介
-
-- Flynnは個々のコンポーネントが独立している
-    - モジュラビリティを重視している
-- 1プロジェクトに1レポジトリ
-- 個々のコンポーネントを見るのはなかなか楽しい
 
 ## Agenda
 
-- Background of Flynn
-- OSS PaaS by Docker
+- Introduction(0.5)
+    - Precondition
+- TL;DR
+- Background of Flynn (背景) (1)
+    - How Heroku works
+    - Q. Why PaaS by Docker ?
+    - A.
+- OSS PaaS by Docker (関連プロジェクト) (2)
+    - Cloud Foundry, dokku, building, Deis, Flynn, (Bazooka)
+    - How dokku works
 - What is Flynn ?
-- Overview of Flynn
-- Architecture of Flynn
+- Why Flynn ? (2)
+    - vs Heroku
+    - vs dokku
+- How flynn works (1)
+    - Figure ...
+- Architecture of Flynn (2)
     - Layer0
     - Layer1
-- Layer0
-- Layer1
-- How Flynn use Docker ?
+- Layer0 (2)
+    - flynn/flynn-host
+        - flynn/sampi
+    - **flynn/discoverd**
+- Layer1 (2)
+    -
+- How Flynn use Docker (2)
+    - Everything in Container
+    - flynn/slugbuilder
+    - flynn/slugrunner
 - Demo (5)
-- Road map of Flynn(0.5)
-- Future of Flynn(0.5)
+- Road map of Flynn, Future of Flynn(0.5)
+    - Container Independence
 - Conlusion(0.5)
 - References
 
@@ -66,6 +78,8 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
     - http://5by5.tv/changelog/99
 - 5by5 | The Changelog #115: Flynn updates with Jonathan Rudenberg and Jeff Lindsay
     - http://5by5.tv/changelog/115
+- Container Independence
+    - https://flynn.io/blog/container-indepedence
 - Bazooka: Continuous Deployment at SoundCloud - Google Slides
     - https://docs.google.com/presentation/d/1ni1BFiVMTLN_8q34si-qPfl0F6w2W3oPVKqSMfcs_XA/edit#slide=id.p
 - Deis: Evolution of a Docker PAAS
