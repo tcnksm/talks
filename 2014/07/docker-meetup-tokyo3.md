@@ -3,6 +3,44 @@ The Age of Flynn
 
 at [Docker meetup Tokyo #3](http://connpass.com/event/6998/)
 
+## Talk overview
+
+- Introduction(0.5)
+    - Precondition
+- TL;DR
+- What is Flynn ?
+- Background of Flynn (背景) (1)
+    - How Heroku works
+    - QA. Why PaaS by Docker ?
+- OSS PaaS by Docker (関連プロジェクト) (2)
+    - Cloud Foundry, dokku, building, Deis, Flynn, (Bazooka)
+    - How dokku works
+- Why Flynn ? (1)
+    - vs Heroku
+    - vs dokku
+- Feature of flynn
+- How flynn works (1)
+    - Figure ...
+- Architecture of Flynn (2)
+    - Layer0
+    - Layer1
+- Layer0 (2)
+    - flynn/flynn-host
+        - flynn/sampi
+    - flynn/discoverd
+- Layer1 (2)
+    - ...
+- How Flynn use Docker (2)
+    - Everything in Container
+    - flynn/slugbuilder
+    - flynn/slugrunner
+- Demo (5)
+- Road map of Flynn, Future of Flynn(0.5)
+    - Container Independence
+- Conlusion(0.5)
+- References
+
+
 ## Introduction
 
 - [SOTA](http://deeeet.com/writing/)
@@ -29,23 +67,105 @@ at [Docker meetup Tokyo #3](http://connpass.com/event/6998/)
 
 Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFlynnの紹介
 
-## Agenda
+- なぜFlynnのようなプロジェクトが登場してきたか
+    - Dockerとの関連は？
+- Flynnは既存のPaaSの何を変えるのか?
+- FlynnがDockerをどのようにつかっているのか?
+- 他のOSSのPaaSにはどんなものがあるか?
+- Flynnのアーキテクチャー
+- デモ
 
-- Introduction(0.5)
-    - Precondition
-- TL;DR
-- Background of Flynn (背景) (1)
-    - How Heroku works
-    - Q. Why PaaS by Docker ?
-    - A.
-- OSS PaaS by Docker (関連プロジェクト) (2)
-    - Cloud Foundry, dokku, building, Deis, Flynn, (Bazooka)
-    - How dokku works
-- What is Flynn ?
-- Why Flynn ? (2)
-    - vs Heroku
-    - vs dokku
-- How flynn works (1)
+## What is Flynn
+
+- Platform-as-a-Service
+- OSS
+- Crowdfunded
+- Go言語
+
+## なぜDocker meetupでFlynnの話をするのか?
+
+"Docker is fun, but not enough"
+
+- Dockerは面白し，触るととても感動する
+- ただこれをどう使っていくのが良いかはまだまだわからない
+- FlynnはDockerをいかに使うかのよい例
+
+## Background
+
+最初にDockerによるPaaSというプロジェクトがなぜ登場してきたかを簡単に説明する．
+
+### How PaaS (Heroku) works
+
+まず，PaaSで一番有名なHerokuの動作をそのワークフローで復習する．
+
+- `heroku create`
+    - Stackと呼ばれるベースとなるOSを準備する
+          - e.g., Cedar stack
+- `git push heroku master`
+    - アプリケーションがデプロイされる
+    - アプリケーションをビルドしてslug（SquashFS）を作成する
+        - slug compiler
+            - 各言語のBuildpackの集合
+            - 依存関係のインストールなどを行う
+              - e.g., RubyならGemfileをもとにrubygemsをインストール
+        - slug
+            - ソースと依存ライブラリ，言語のランタイムを含んだ圧縮されたファイルシステム(SquashFS)
+    - アプリケーションの実行環境（Dyno）を準備する
+        - Dyno
+            - **LXCをベースにしたContainer環境**
+    - Dynoにslugをロードする
+    - Procfileをもとにアプリケーションを起動する
+        - Procfile
+            - プロセスの起動コマンドを記述
+                - e.g., web: bundle exec rails server -p $PORT
+- `heroku ps:scale web=2`(Heroku)
+    - webのプロセスを増やす = 実行Dynoの数を増やす
+        - https://s3-eu-west-1.amazonaws.com/jon-assettest/dynos.jpg
+- `heroku run bash`
+    - Dynoにログインする
+        - 新しくDynoが準備され，最新のSlugが読み込まれる
+        - 変更は他のDynoに影響を与えない
+
+"Heorkuの重要な構成要素の１つはLXCベースの実行環境Dyno"
+
+### Why PaaS by Docker ?
+
+- Heroku slug = Docker image
+    - 言語のランタイムやアプリケーションの依存を含んだファイルシステム
+- Heroku Dyno = Docker container
+
+- Dockerによりカジュアルにコンテナ仮想化を扱えるようになった
+- ファイルシステムをイメージとして保存，配布できるようになった
+（Buildpackという標準の仕様があり，それが公開されている）
+
+
+## OSS PaaS by Docker
+
+そういうわけで，Dockerを使ってPaaSを構築するプロジェクトが多く登場してきた．
+
+- dokku
+    - 100行のbashで書かれたシンプルなPaaS実装
+- building
+   - dokku - git-receive
+- Deis
+   - ≒ Flynn
+   - マルチホストのPaaS
+   - on CoreOS
+
+### How dokku works
+
+
+## Why Flynn ?
+
+### vs Heroku
+
+### vs dokku
+
+- bashによる実装
+- DokkuはPaaSの最低限の機能を持つ
+
+
+## How flynn works (1)
     - Figure ...
 - Architecture of Flynn (2)
     - Layer0
@@ -53,18 +173,43 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
 - Layer0 (2)
     - flynn/flynn-host
         - flynn/sampi
-    - **flynn/discoverd**
+    - flynn/discoverd
 - Layer1 (2)
-    -
+    - ...
 - How Flynn use Docker (2)
     - Everything in Container
     - flynn/slugbuilder
     - flynn/slugrunner
-- Demo (5)
-- Road map of Flynn, Future of Flynn(0.5)
-    - Container Independence
-- Conlusion(0.5)
-- References
+
+##
+
+
+## Roadmap of Flynn
+
+"Production環境で安定して動作させることが最優先"
+    - テストカバレッジの向上と，セキュリティに注力
+
+### 今後の予定 (2014.07現在)
+
+- 数週間以内にFlynn Beta（社内環境向け）をリリース
+- 夏の終わりにFlynn 1.0をリリース
+
+
+## Future of Flynn
+
+"Container Indepnedence"
+
+- FlynnのユーザはDocker Incや他の企業に結びつけられるべきではない
+
+### pinkerton
+
+- a tool for using Docker images with other container runners
+    - Docker(libcontainer), systemd+nspawn, LXC, libvirt-lxc, Lmctfy, OpenVZ
+- https://cloud.githubusercontent.com/assets/13026/3220006/68b7cc1a-effb-11e3-8386-64e34b9c54d8.png
+
+
+## Conclusion
+
 
 ## References
 
