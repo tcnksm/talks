@@ -9,11 +9,11 @@ at [Docker meetup Tokyo #3](http://connpass.com/event/6998/)
     - Precondition
 - TL;DR
 - What is Flynn ?
-- Background of Flynn (背景) (1)
+- Background of Flynn (背景) (2)
     - How Heroku works
-    - QA. Why PaaS by Docker ?
+    - Why PaaS by Docker ?
 - OSS PaaS by Docker (関連プロジェクト) (2)
-    - Cloud Foundry, dokku, building, Deis, Flynn, (Bazooka)
+    - dokku, building, Deis, Flynn, (Bazooka)
     - How dokku works
 - Why Flynn ? (1)
     - vs Heroku
@@ -82,9 +82,9 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
 - Crowdfunded
 - Go言語
 
-## なぜDocker meetupでFlynnの話をするのか?
+### Why Flynn's talk in Docker meetup ?
 
-"Docker is fun, but not enough"
+"Docker is great, but not enough"
 
 - Dockerは面白し，触るととても感動する
 - ただこれをどう使っていくのが良いかはまだまだわからない
@@ -130,13 +130,14 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
 
 ### Why PaaS by Docker ?
 
-- Heroku slug = Docker image
-    - 言語のランタイムやアプリケーションの依存を含んだファイルシステム
-- Heroku Dyno = Docker container
-
 - Dockerによりカジュアルにコンテナ仮想化を扱えるようになった
 - ファイルシステムをイメージとして保存，配布できるようになった
 （Buildpackという標準の仕様があり，それが公開されている）
+
+
+- Heroku slug = Docker image
+    - 言語のランタイムやアプリケーションの依存を含んだファイルシステム
+- Heroku Dyno = Docker container
 
 
 ## OSS PaaS by Docker
@@ -154,34 +155,108 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
 
 ### How dokku works
 
-
-## Why Flynn ?
-
-### vs Heroku
-
-### vs dokku
-
 - bashによる実装
 - DokkuはPaaSの最低限の機能を持つ
 
+## Goal of Flynn
 
-## How flynn works (1)
-    - Figure ...
-- Architecture of Flynn (2)
-    - Layer0
-    - Layer1
-- Layer0 (2)
-    - flynn/flynn-host
-        - flynn/sampi
-    - flynn/discoverd
-- Layer1 (2)
-    - ...
-- How Flynn use Docker (2)
-    - Everything in Container
-    - flynn/slugbuilder
-    - flynn/slugrunner
+"The product that ops provides to developers
 
-##
+- Easy deployment
+    - git pushで
+    - Docker containerで
+- Run anything
+    - どんな言語でも
+    - どんなフレームワークでも
+- Painless Scaling
+    - 新たにノードを追加するだけで，スケールもしくはクラスタを追加できる
+- Simple and composable
+    - 簡単に各コンポーネントを変更したり，切り替えたりできる
+        - すべての機能がモジュールとして実装
+        - APIとして実装
+
+## Why Flynn ?
+
+Herokuの簡便さとAmazon EC2のような自由度を兼ね備えたPaaS
+
+### vs Heroku
+
+- Heroku++
+    - http://progrium.com/blog/2014/02/06/the-start-of-the-age-of-flynn/
+
+### vs dokku
+
+- dokku ++
+    - マルチホストに対応
+    - 分散システムの上にのったdokkuとも見なすことができる
+    - 個々の機能が全てモジュール化され，dockerコンテナになっている
+
+## How flynn works
+
+
+## Architecture of Flynn(1/3)
+
+Flynnのアーキテクチャはシンプルかつ理解しやすいようにデザインされている
+
+- ほとんど全てのシステムがDockerコンテナでコンテナ内で動く
+    - Flynnを構成するコンポーネントは，Flynnにデプロイされるサービスやアプリケーションと
+変わらないと考えることができる
+
+
+## Architecture of Flynn(2/3)
+
+**flynn/flynn-demo**を見るとよくわかる，インストールはすべてdocker pullで済ませている
+
+```ruby
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "flynn-base"
+  ...
+
+  config.vm.provision "shell", inline: <<SCRIPT
+    # layer0
+    docker pull flynn/host
+    docker pull flynn/discoverd
+    docker pull flynn/etcd
+
+    # layer1
+    docker pull flynn/postgres
+    docker pull flynn/controller
+    docker pull flynn/gitreceive
+    docker pull flynn/strowger
+    docker pull flynn/shelf
+    docker pull flynn/slugrunner
+    docker pull flynn/slugbuilder
+    docker pull flynn/bootstrap
+
+    docker run -e=DISCOVERD=${IP_ADDR}:1111 flynn/bootstrap
+SCRIPT
+end
+```
+
+## Architecture of Flynn(3/3)
+
+Flynnは2つのレイヤーで構成される
+
+- **layer0 (The Grid)**
+    - 低位なリソースフレームワーク層
+    - この上の全てのアプリケーションやサービスの基礎
+    - コンテナ管理, サービスディスカバリー, タスクスケジューラー, 分散型KVS（etcd）
+- **layer1**
+    - 高位なコンポーネント層
+    - Git-receive，Heroku Buildpack，DB，HTTP Routing，
+
+## Layer0
+
+### flynn/flynn-host
+
+
+
+###
+
+## Layer1
+
+
+## DEMO
 
 
 ## Roadmap of Flynn
