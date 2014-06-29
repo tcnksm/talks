@@ -193,7 +193,6 @@ Herokuの簡便さとAmazon EC2のような自由度を兼ね備えたPaaS
 
 ## How flynn works
 
-
 ## Architecture of Flynn
 
 Flynnのアーキテクチャはシンプルかつ理解しやすいようにデザインされている
@@ -242,13 +241,94 @@ Flynnは2つのレイヤーで構成される
 
 ## Layer0
 
+### Overview fo Layer0
+
+クラスタ内の全てのホストで実行
+
+- flynn/discoverd
+    - https://github.com/flynn/discoverd
+    - サービスディスカバリー
+- flynn/flynn-host
+    - https://github.com/flynn/flynn-host
+    - コンテナ管理，タスクスケジューラー
+
+### flynn/discoverd
+
+- サービスディスカバリー
+    - クラスタの構築
+    - メンバーの参加/離脱イベントを通知
+    - クラスタのリーダの選出
+- クライアント (flynn/go-discoverd)
+    - クラスタへのホストの登録/削除
+    - 各ホストのアドレスやメタ情報，新しいホストの参加/離脱のイベントの購読
+- バックエンドに**etcd**を利用
+    - ZooKeeperなどに入れ替え可能
+
 ### flynn/flynn-host
 
+- Dockerコンテナ管理
+    - HTTP API経由で複数ホストの複数のDockerコンテナを管理
+- 役割
+    - リーダー
+        - クラスタ全体のホストの一覧とそれらが実行しているジョブの管理
+        - 新しいジョブの登録
+    - それ以外
+        - リーダからのジョブをDockerコンテナで実行
+        - 指定されたジョブの停止
+        - 実行中のジョブ，指定されたジョブの情報の返答
+- ジョブ
 
+```go
+type Job struct {
+	ID string
 
-###
+	// Job attributes
+	Attributes map[string]string
+	// Number of TCP ports required by the job
+	TCPPorts int
+
+	Config     *docker.Config
+	HostConfig *docker.HostConfig
+}
+
+```
+
+```go
+// https://github.com/flynn/go-dockerclient/blob/master/docker.go
+
+type Config struct {
+	Hostname        string
+	Domainname      string
+	User            string
+	Memory          int64 // Memory limit (in bytes)
+	MemorySwap      int64 // Total memory usage (memory + swap); set `-1' to disable swap
+	CpuShares       int64 // CPU shares (relative weight vs. other containers)
+	AttachStdin     bool
+	AttachStdout    bool
+	AttachStderr    bool
+	PortSpecs       []string // Deprecated - Can be in the format of 8080/tcp
+	ExposedPorts    map[string]struct{}
+	Tty             bool // Attach standard streams to a tty, including stdin if it is not closed.
+	OpenStdin       bool // Open stdin
+	StdinOnce       bool // If true, close stdin after the 1 attached client disconnects.
+	Env             []string
+	Cmd             []string
+	Dns             []string
+	Image           string // Name of the image as it was passed by the operator (eg. could be symbolic)
+	Volumes         map[string]struct{}
+	VolumesFrom     string
+	WorkingDir      string
+	Entrypoint      []string
+	NetworkDisabled bool
+	Name            string `json:"-"`
+}
+```
 
 ## Layer1
+
+### Overview fo Layer1
+
+
 
 
 ## DEMO
