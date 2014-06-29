@@ -328,11 +328,118 @@ type Config struct {
 
 ### Overview fo Layer1
 
+- flynn/flynn-controller
+    - HTTP APIサーバー
+    - (≒ Heroku Platform API)
+- flynn/strowger
+    - TCP/HTTP ルータ（リバースプロキシ）
+- flynn/gitreceived
+    - git pushをうけることに特化したSSHサーバ
+- flynn/slugbuilder
+    - DockerとBuildpackで（Heroku的な）slugの作成
+- flynn/slugrunner
+　　　- slugbuilderで作成されたslugの実行
+- flynn/shelf
+    - シンプルで，高速なHTTPのファイルサービス
+    - (≒シンプルなAmazon S3)
+- flynn/flynn-postgres
+    - Flynn用のPostgreSQL
+- flynn/flynn-cli
+    - コマンドラインクライアント
+    - (≒ heroku-toolbelt)
 
+- flynn/flynn-bootstrap
+    - Layer1の起動
 
+（図）
+
+### flynn/flynn-controller
+
+### flynn/strowger
+
+### flynn/slugbuilder + flynn/slugrunner
+
+### Other services
+
+-
+- flynn/taffy
+   - レポジトリをpullしてFlynnにデプロイ
 
 ## DEMO
 
+flynn-cliをインストールする
+
+```bash
+L=/usr/local/bin/flynn && curl -sL -A "`uname -sp`" https://flynn-cli.herokuapp.com/flynn.gz | zcat >$L && chmod +x $L
+```
+
+ホストを立ち上げる
+
+```bash
+git clone https://github.com/flynn/flynn-demo
+cd flynn-demo
+vagrant up
+```
+
+最後に出力されるコマンドをコピペしてサーバを登録する
+
+```bash
+flynn server-add -g localhost:2201 \
+    -p boAKKeTdRqNVRdsmVmXCA8jwucmYLWKTZLNIUK+qcmc= \
+    default https://localhost:8081 \
+    61ae3daf3b95ab2f2542ee66980c84ba
+```
+
+SSH keyを登録する
+
+```bash
+flynn key-add
+```
+
+アプリケーションをデプロイする
+
+```bash
+git clone https://github.com/flynn/nodejs-flynn-example
+cd nodejs-flynn-example
+flynn create example
+git push flynn master
+```
+
+webプロセスを作る
+
+```bash
+flynn scale web=3
+```
+
+ルートを設定する(?)
+
+```bash
+flynn route-add-http localhost:8080
+```
+
+アクセスする
+
+```bash
+curl localhost:8080
+```
+
+プロセスの確認
+
+```bash
+flynn ps
+```
+
+ログの確認
+
+```bash
+flynn log e4cffae4ce2b-8cb1212f582f498eaed467fede768d6f
+```
+
+run
+
+```bash
+flynn run bash
+```
 
 ## Roadmap of Flynn
 
