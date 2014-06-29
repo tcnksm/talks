@@ -160,7 +160,7 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
 
 ## Goal of Flynn
 
-"The product that ops provides to developers
+**"The product that ops provides to developers"**
 
 - Easy deployment
     - git pushで
@@ -179,12 +179,12 @@ Dockerの応用例の1つであるOSSのPaaSを構築することを目指すFly
 
 Herokuの簡便さとAmazon EC2のような自由度を兼ね備えたPaaS
 
-### vs Heroku
+### vs. Heroku
 
 - Heroku++
     - http://progrium.com/blog/2014/02/06/the-start-of-the-age-of-flynn/
 
-### vs dokku
+### vs. dokku
 
 - dokku ++
     - マルチホストに対応
@@ -194,16 +194,13 @@ Herokuの簡便さとAmazon EC2のような自由度を兼ね備えたPaaS
 ## How flynn works
 
 
-## Architecture of Flynn(1/3)
+## Architecture of Flynn
 
 Flynnのアーキテクチャはシンプルかつ理解しやすいようにデザインされている
 
 - ほとんど全てのシステムがDockerコンテナでコンテナ内で動く
     - Flynnを構成するコンポーネントは，Flynnにデプロイされるサービスやアプリケーションと
 変わらないと考えることができる
-
-
-## Architecture of Flynn(2/3)
 
 **flynn/flynn-demo**を見るとよくわかる，インストールはすべてdocker pullで済ませている
 
@@ -232,8 +229,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 SCRIPT
 end
 ```
-
-## Architecture of Flynn(3/3)
 
 Flynnは2つのレイヤーで構成される
 
