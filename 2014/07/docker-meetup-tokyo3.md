@@ -245,14 +245,14 @@ Flynnは2つのレイヤーで構成される
 
 クラスタ内の全てのホストで実行
 
-- flynn/discoverd
+- [D] flynn/discoverd
     - https://github.com/flynn/discoverd
     - サービスディスカバリー
-- flynn/flynn-host
+- [H] flynn/flynn-host
     - https://github.com/flynn/flynn-host
     - コンテナ管理，タスクスケジューラー
 
-### flynn/discoverd
+### [D] flynn/discoverd
 
 - サービスディスカバリー
     - クラスタの構築
@@ -264,7 +264,7 @@ Flynnは2つのレイヤーで構成される
 - バックエンドに**etcd**を利用
     - ZooKeeperなどに入れ替え可能
 
-### flynn/flynn-host
+### [H] flynn/flynn-host
 
 - Dockerコンテナ管理
     - HTTP API経由で複数ホストの複数のDockerコンテナを管理
@@ -276,6 +276,10 @@ Flynnは2つのレイヤーで構成される
         - リーダからのジョブをDockerコンテナで実行
         - 指定されたジョブの停止
         - 実行中のジョブ，指定されたジョブの情報の返答
+- [S] ジョブスケジューラー
+    - flynn/flynn-host/sampi
+        - スケジューラーフレームワーク
+        - シンプルな Mesos
 - ジョブ
 
 ```go
@@ -328,58 +332,98 @@ type Config struct {
 
 ### Overview fo Layer1
 
-- flynn/flynn-controller
+- [G] flynn/gitreceived
+    - git pushをうけることに特化したSSHサーバ
+- [C] flynn/flynn-controller
     - HTTP APIサーバー
     - (≒ Heroku Platform API)
-- flynn/strowger
-    - TCP/HTTP ルータ（リバースプロキシ）
-- flynn/gitreceived
-    - git pushをうけることに特化したSSHサーバ
-- flynn/slugbuilder
+- [SB] flynn/slugbuilder
     - DockerとBuildpackで（Heroku的な）slugの作成
-- flynn/slugrunner
+- [SR] flynn/slugrunner
 　　　- slugbuilderで作成されたslugの実行
-- flynn/shelf
-    - シンプルで，高速なHTTPのファイルサービス
-    - (≒シンプルなAmazon S3)
-- flynn/flynn-postgres
+- [R] flynn/strowger
+    - TCP/HTTP ルータ（リバースプロキシ）
+- [DB] flynn/flynn-postgres
     - Flynn用のPostgreSQL
 - flynn/flynn-cli
     - コマンドラインクライアント
     - (≒ heroku-toolbelt)
 
-- flynn/flynn-bootstrap
-    - Layer1の起動
 
-（図）
+### [C] flynn/flynn-controller
 
-### flynn/flynn-controller
+HTTP APIサーバー
 
-### flynn/strowger
 
-### flynn/slugbuilder + flynn/slugrunner
+### [G] flynn/gitreceived
 
-### Other services
+git pushをうけることに特化したSSHサーバ
 
--
-- flynn/taffy
-   - レポジトリをpullしてFlynnにデプロイ
+1. git pushによりアプリケーションのコードがデプロイされる
+2. ssh-keyによる認証を行う
+3. pushされたアプリケーションのtarを引数に`receiver`スクリプトを実行する
 
-## DEMO
+### flynn/flynn-gitreceived
 
-flynn-cliをインストールする
+gitreceivedを使ってアプリケーションのビルドと実行を行う
+
+`receiver`スクリプトはflynn-controllerに対して以下を要請する
+
+1. git pushされたアプリケーションのtarをslugbuilderに渡してビルドする（slugの作成）
+    - slug(.tgz)をshelf（ファイルサーバ）上に作成する
+2. 作成されたビルドをslugrunnerで実行する
+
+### [SB] flynn/slugbuilder
+
+DockerとBuildpackで（Heroku的な）slugの作成する
+
+Herokuの場合（slug-compiler）
+-> buildpackでアプリケーションのビルド
+-> ビルドをslug（SquashFS:Dynoで利用可能な圧縮ファイルシステム）として保存
+
+Flynnの場合
+-> Dockerコンテナ内（クリーン！！）でBuildpackを使ってアプケーションのビルド
+-> ビルドを.tgz形式に固めて保存
+
 
 ```bash
-L=/usr/local/bin/flynn && curl -sL -A "`uname -sp`" https://flynn-cli.herokuapp.com/flynn.gz | zcat >$L && chmod +x $L
+$ id=$(git archive master | docker run -i -a stdin flynn/slugbuilder) # buildpackによるビルド
+$ docker wait $id
+$ docker cp $id:/tmp/slug.tgz . # コンテナ内のslug.tgzを取り出す
 ```
 
-ホストを立ち上げる
+### [SR] flynn/slugrunner
+
+slugbuilderで作成された（Heroku的な）slugを実行する
+
+Herokuの場合
+-> Dynoにslugをロードする
+-> Procfileをもとにアプリケーションを起動する
+
+Flynnの場合
+-> Dockerコンテナ内にslug(.tgz)をロードする
+-> ProcfileをもとにDockerコンテナを起動する
+
+
+直接.tgzを標準入力からコンテナに渡す
 
 ```bash
-git clone https://github.com/flynn/flynn-demo
-cd flynn-demo
-vagrant up
+$ cat myslug.tgz | docker run -i -a stdin -a stdout flynn/slugrunner start web
 ```
+
+slugのURLを与える
+
+```bash
+$ docker run -e SLUG_URL=http://example.com/slug.tgz -i -t flynn/slugrunner start web
+```
+
+### [R] flynn/strowger
+
+TCP/HTTP ルータ（リバースプロキシ）
+
+
+
+### flynn/flynn-cli
 
 最後に出力されるコマンドをコピペしてサーバを登録する
 
@@ -399,8 +443,6 @@ flynn key-add
 アプリケーションをデプロイする
 
 ```bash
-git clone https://github.com/flynn/nodejs-flynn-example
-cd nodejs-flynn-example
 flynn create example
 git push flynn master
 ```
@@ -408,7 +450,7 @@ git push flynn master
 webプロセスを作る
 
 ```bash
-flynn scale web=3
+flynn scale web=1
 ```
 
 ルートを設定する(?)
@@ -416,6 +458,24 @@ flynn scale web=3
 ```bash
 flynn route-add-http localhost:8080
 ```
+
+スケールする
+
+```bash
+flynn scale web=3
+```
+
+### Other services in Layer1
+
+- flynn/shelf
+    - シンプルで，高速なHTTPのファイルサービス
+    - (≒シンプルなAmazon S3)
+- flynn/flynn-bootstrap
+    - Layer1の起動
+- flynn/taffy
+   - レポジトリをpullしてFlynnにデプロイ
+
+## DEMO
 
 アクセスする
 
