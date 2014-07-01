@@ -354,6 +354,9 @@ type Config struct {
 
 HTTP APIサーバー
 
+- Flynn上で動く全てのアプリケーションをHTTP APIで操作する
+- HerokuのPlatform APIにインスパイアされている
+- flynn-cliクライアントから利用できる
 
 ### [G] flynn/gitreceived
 
@@ -419,9 +422,17 @@ $ docker run -e SLUG_URL=http://example.com/slug.tgz -i -t flynn/slugrunner star
 
 ### [R] flynn/strowger
 
-TCP/HTTP ルータ（リバースプロキシ）
+TCP/HTTP ルータ
 
+https://commons.wikimedia.org/wiki/File:HebdrehwaehlerbatterieOrtsvermittlung_4954.jpg
 
+- ランダムロードバランシングのためのリバースプロキシとして動作する
+- サービスディスカバリーによりバックエンドで何が起動したかを常に監視する
+    - e.g., 複数のslugrunner（アプリケーション）に対してランダムにリクエストを振り分ける
+- vs. HAProxy/nginx
+    - サービスディスカバリーによる動的な設定変更が可能
+　　　    - HAProxyやnginxは設定更新のために新しいプロセスが必要になる
+    - (だたしまだプロトタイプなので，プロダクション環境ではサービスディスカバリー+HAProxyの方がよい)
 
 ### flynn/flynn-cli
 
