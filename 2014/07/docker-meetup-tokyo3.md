@@ -488,29 +488,143 @@ flynn scale web=3
 
 ## DEMO
 
-アクセスする
+- AWSとDigitalOceanのアカウントがあれば利用可能
+- 5分程度で立ち上がる
+
+
+### serverの登録（server.go）
 
 ```bash
-curl localhost:8080
+$ flynn server-add \
+    -g lxr.flynnhub.com \ #githost
+    -p GHj+Q74JItrqrf+kn7jHCRX3rBEe6cuzkolRcohQrHQ= \ # SHA256 of the server's TLS cert
+    "flynn-demo" \ # server-name
+    https://lxr.flynnhub.com \ # server url
+    69e3ea9510205c532c4133b1b6c7e2c9 # key
 ```
 
-プロセスの確認
+Usage
+
+```bash
+$ server-add [-g <githost>] [-p <tlspin>] <server-name> <url> <key>
+```
+
+中身を見る（消せば何度でも利用可能）
+
+```bash
+cat ~/.flynnrc
+```
+
+### SSH-KEYを登録する
+
+```bash
+$ flynn key-add
+```
+
+### アプリケーションの作成（app.go）
+
+中身，git remoteをしつつ，コントローラーに伝えている
+
+```go
+exec.Command("git", "remote", "remove", "flynn").Run()
+exec.Command("git", "remote", "add", "flynn", gitURLPre(serverConf.GitHost)+app.Name+gitURLSuf).Run()
+```
+
+```bash
+flynn create node-demo
+Created node-demo
+```
+
+### アプリケーションのデプロイ
+
+nodeのサンプルを上げる
+
+```bash
+$ git push flynn master
+The authenticity of host 'lxr.flynnhub.com (107.170.153.129)' cant be established.
+RSA key fingerprint is 6b:d2:2b:16:85:f7:2b:cf:7c:60:6b:02:fd:24:87:23.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'lxr.flynnhub.com,107.170.153.129' (RSA) to the list of known hosts.
+Counting objects: 18, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (17/17), done.
+Writing objects: 100% (18/18), 1.84 KiB | 0 bytes/s, done.
+Total 18 (delta 6), reused 0 (delta 0)
+-----> Building node-demo...
+-----> Node.js app detected
+-----> Requested node range: 0.10.x
+-----> Resolved node version: 0.10.29
+-----> Downloading and installing node
+-----> Writing a custom .npmrc to circumvent npm bugs
+-----> Installing dependencies
+       npm WARN package.json node-example@0.0.1 No description
+       npm WARN package.json node-example@0.0.1 No repository field.
+       npm WARN package.json node-example@0.0.1 No README data
+-----> Cleaning up node-gyp and npm artifacts
+-----> Building runtime environment
+-----> Discovering process types
+       Procfile declares types -> web
+-----> Compiled slug size is 5.2M
+-----> Creating release...
+=====> Application deployed
+To ssh://git@lxr.flynnhub.com/node-demo.git
+ * [new branch]      master -> master
+```
+
+### ルートの表示
+
+```bash
+$ flynn routes
+ROUTE                            SERVICE        ID
+http:node-demo.lxr.flynnhub.com  node-demo-web  http/65ae6884514622f0e7dcd85f71724814
+```
+
+### ルートの追加（route.go）
+
+```bash
+$ flynn route-add-http docker-meetup.lxr.flynnhub.com
+$ flynn routes
+ROUTE                                SERVICE        ID
+http:docker-meetup.lxr.flynnhub.com  node-demo-web  http/8aecdfad5adb70ddff6a2ac32b79da4d
+http:node-demo.lxr.flynnhub.com      node-demo-web  http/65ae6884514622f0e7dcd85f71724814
+```
+
+### ルートの削除
+
+```bash
+$ flynn route-remove http/baf06246e4ec7f3486a89a2e313205ba
+```
+
+### プロセスの確認
 
 ```bash
 flynn ps
 ```
 
-ログの確認
+### ログの確認
 
 ```bash
 flynn log e4cffae4ce2b-8cb1212f582f498eaed467fede768d6f
 ```
 
-run
+### スケールする
+
+```bash
+$ flynn scale web=8
+```
+
+### Docker コンテナに入る
 
 ```bash
 flynn run bash
 ```
+### 緊急対応
+
+```bash
+ssh n0.lxr.flynnhub.com
+```
+-> 無理
+
 
 ## Roadmap of Flynn
 
@@ -565,3 +679,5 @@ flynn run bash
     - http://r7kamura.github.io/2014/06/24/discoverd.html
 - Flynn Host - r7km/s
     - http://r7kamura.github.io/2014/06/26/flynn-host.html
+- Beyond Flynn, or Flynn-as-a-Worldview
+    - http://progrium.com/blog/2014/07/01/beyond-flynn-or-flynn-as-a-worldview/
