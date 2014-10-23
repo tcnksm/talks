@@ -1,20 +1,20 @@
 Move fast and don't break your infra configuraion
+====
 
-- Move first and don’t break your infra configuration
+- Ok, Move fast and don’t break your infra configuration
 - Hi, This is me
-  - I’m known as deeeet in twitter
+  - I'm known as deeeet in twitter
   - And I’m working as a Software engineer in Rakuten
 - This is my Japanese blog
-  - I sometime write about Docker or Golang
+  - I write something about Docker or Golang
   - If you like my presentation today, Please check it
 - And I build some tool
   - This is cli-init
     - It provides the easy way to start building Golang command-line application
   - And this is GHR
-    - With this tool, you can release your tool to Github very easily
-  - Please check it
+    - It enables you to release your tool to Github very easily
 - Ok, I’m gonna Talk About Docker
-  - But Today is Chef, Docker, Openstack, Puppet meetup. So I would like to talk tool related to all of them.
+  - But Today is comunities meetup. So I would like to talk tool related to Chef or Puppet or OpenStack
 - So do you think Container is future ?
   - Google says:
     - Every thing at Google runs in a container
@@ -27,37 +27,30 @@ Move fast and don't break your infra configuraion
 - But How ?
   - There are some risks and We may already have its own infrastructure configuration like Chef, puppet or Ansible
 - One of my opinion is:
-  - Packer
+  - using Packer
 - Packer is:
   - an open source tool for creating machine images from a single json configuration file.
-  - able to use configuration tools to install software onto the image
-  - One of great Advantages Of Using Packer is portable
 - Packer creates image for
-  - Docker and OpenStack, EC2 and so on
+  - Docker and OpenStack, Amazon AMI and so on
 - And packer is able to use Chef or Puppet or Ansible for machine provisioning
-- So you can try 
-- It’s very important because Big IT try to minimise risk, packer provide very pretty way to get in
-- If you want to try Docker ?
-  - With Packer you can build docker image without Dockerfile
+- It means you can build docker without Dockerfile but with your configuration tool
+- It’s very important because If you don't like Docker, Dockerfiles have to be translated over to another format
+- You can easily pivot Without Breaking Your Infra Configuration
 - Ok, Let’s build docker image with your chef cookbook
 - All we need to do is to prepare a single json file and our chef cookbook
 - In json file, we need to write 3 parts, builders and provisioner and post-processor
-- In builder, write base image to start with
-  - In this case, provide ubuntu
-- In provisioner, write how to install software and configure it
-  - In this case, provide chef cookbook path and run-list for it
-- In post-processor, write how to generate machine image
-  - In this case, commit with tag 
+- In builder section, write base image to start with
+  - In this case, I'm providing ubuntu
+- In provisioner section, write how to install software and configure it
+  - In this case, I'm provide chef cookbook path and run-list for it
+- In post-processor section, write how to generate machine image
+  - In this case, I'm commiting with tag 
 - That’s it every simple
 - And after that, type packer build machine.json
-  - You can get docker image with chef provisioned
+  - You can get docker image without Dockerfile
 - Ok I’ll do some simple domo
 
-
-
-
-
-
+```json
  "builders": ()
  "type": "docker",
  "image": "ubuntu:latest",
@@ -85,7 +78,7 @@ Move fast and don't break your infra configuraion
  "docker-push"
  ]
  }
-
+```
 
 
 
