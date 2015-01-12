@@ -7,6 +7,9 @@ This is my presentation slides. You can see most slides on [Speaker Deck](https:
 
 ### 2015
 
+- ["About CoreOS"]() at [Docker Meetup Tokyo #4](http://connpass.com/event/10318/), [`Note`](/2015/01/docker-meetup-tokyo4.md), [`slide`](/2015/01/docker-meetup-tokyo4.key)
+
+
 ### 2014
 
 - ["Docker ApplicationをDaaSにデプロイ"](https://speakerdeck.com/tcnksm/docker-applicationwodaasnidepuroi-number-dockerjp) at [Docker Meetup Tokyo #2](http://connpass.com/event/5640/), [`Slide`](/2014/04/docker-meetup-tokyo2.key)
