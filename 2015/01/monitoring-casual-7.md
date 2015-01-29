@@ -46,31 +46,39 @@ docker run \
 ## Monitoring as a Service
 
 - Mackerel
+	-　Not support Container specific feature ..? 	
+		- If supported, I want to use..	　
 	- [https://github.com/stanaka/mackerel-docker](https://github.com/stanaka/mackerel-docker) ?
-	- 現状が不明，README.mdも空白...
-	- 今後もしサポートされるなら使いたい
+
 - Newrelic 
-	- [https://github.com/johanneswuerbach/newrelic-sysmond-service](https://github.com/johanneswuerbach/newrelic-sysmond-service)
-	- Dockerコンテナではなくてホストのみの監視，Agentがインストールされたコンテナを準備する必要がある
+	- Not support Contaienr specific feature ...?
+	- Provide dockerized agent but only for host metrics
+		- Not Containers, Need to install agent to its container
+	- For CoreOS host
+		- [https://github.com/johanneswuerbach/newrelic-sysmond-service](https://github.com/johanneswuerbach/newrelic-sysmond-service)
 - Datadog
+	- Support Container specific feature
+		- Tagging by docker iamage, container name, Collecting docker event
 	- [https://github.com/DataDog/docker-dd-agent](https://github.com/DataDog/docker-dd-agent)
-	- Dockerコンテナのメトリクス収集をサポート
-	- ホストにあるコンテナ全てのメトリクスを取得することができる
+		- Dockerized agent. Collect all containers metrics on a host (same as cAdvisor)
+
 
 ## DataDog (Docker-specific)
 
-- Containers
-	- ホストのコンテナ全てのメトリクスを収集する
+- All containers metrics on a host
 	- CPU, memory, network I/O and disk I/O
 - Tag
-	- デフォルトで，Containerのnameとimageのタグをつけてくれる
-- Lifecycle
-	- Containerのcreate/start/stop/destroyイベントを収集する
-	- グラフ内でそのイベントの様子がみれる
-		- 例えば個々でCPUが跳ね上がったのでコンテナをPullしたからだなとか
+	- By container name, its images name 
+	- -> easy to summarize and draw graph
+- Lifecycle Event
+	- create, start, stop, destroy Event 
+	- -> We can see event on graph, so we can understand abnormal graph meanings
+
 -  Datadog agent & DogStatsD
 	- Datadog agent -\> like number of containers, load, memory, disk usage, and latency
 	- DogStatsD -\> custom metrics you have instrumented in containerized application
+
+## DEMO 
 
 ## Requirement
 
