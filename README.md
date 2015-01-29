@@ -7,7 +7,8 @@ This is my presentation slides. You can see most slides on [Speaker Deck](https:
 
 ### 2015
 
-- ["About CoreOS"]() at [Docker Meetup Tokyo #4](http://connpass.com/event/10318/), [`Note`](/2015/01/docker-meetup-tokyo4.md), [`slide`](/2015/01/docker-meetup-tokyo4.key)
+- ["Deploy Docker Containers on CoreOS Cluster"](https://speakerdeck.com/tcnksm/coreoskurasutanidockerkontenawodepuroi-number-dockerjp) at [Docker Meetup Tokyo #4](http://connpass.com/event/10318/), [`Note`](/2015/01/docker-meetup-tokyo4.md), [`slide`](/2015/01/docker-meetup-tokyo4.key)
+- ["Monitor Docker Containers on CoreOS Cluster"]() at [Monitoring Casual Talks #7](http://www.zusaar.com/event/9807003), [`Note`](/2015/01/monitoring-casual-7.md), [`slide`](/2015/01/)
 
 
 ### 2014
