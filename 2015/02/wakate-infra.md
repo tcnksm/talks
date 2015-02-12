@@ -16,6 +16,15 @@
     - New Technology driven Studying
 - Future work
 
+## Quote
+
+```
+インフラストラクチャ運用の新しい世界は希望にあふれています。それは、一部はコンテナで、一部は分散システムという手法です。これは間違いなくインフラストラクチャ運用の新しい方法であり、この新しい方法は企業が現在のやり方と対比しながら、将来どのようにするかということに根本的に影響します - Alex Polvi
+```
+
+[https://jp.linux.com/news/linuxcom-exclusive/426261-lco2015021001](https://jp.linux.com/news/linuxcom-exclusive/426261-lco2015021001)
+
+
 ## MISC
 
 - このトーク内容にうまく当てまるトークスタイルがあるとよい
