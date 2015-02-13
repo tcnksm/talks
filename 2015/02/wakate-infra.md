@@ -5,22 +5,27 @@
 ## Overview
 
 - 過去
-    - 大学
-    - 大学院
-    - Application Engineer
-        - Developer Productivity
-    - DevOps Engineer
+    - 経歴
+        - 2010 - 2011，大学
+        - 2011 - 2013，大学院
+        - 2013 - 2014，Application Engineer (Developer Productivity)
+        - 2014 - 2015，DevOps Engineer
+    - 変革
+        - 研究者からエンジニアへ
+        - 社内から社外へ
+        - DevからDevOpsエンジニアへ
 - 現在
     - 取り組み
     - 学び
-        - 低レイヤーの探求
     - 苦悩
 - 未来
      - コンテナ
      - 分散システム
-     - Go言語
-- 思想
-
+     - Go言
+- 思考
+    - アカデミアと実用の狭間
+    - 未来と現実の狭間
+    - 何かが変わるかもしれないフロンティア
 
 ### 苦悩
 
