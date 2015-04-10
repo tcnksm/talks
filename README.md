@@ -11,7 +11,7 @@ This is my presentation slides. You can see most slides on [Speaker Deck](https:
 - ["Deploy Docker Containers on CoreOS Cluster"](https://speakerdeck.com/tcnksm/coreoskurasutanidockerkontenawodepuroi-number-dockerjp) at [Docker Meetup Tokyo #4](http://connpass.com/event/10318/), [`Note`](/2015/01/docker-meetup-tokyo4.md), [`slide`](/2015/01/docker-meetup-tokyo4.key)
 - ["Monitor Docker Containers on CoreOS Cluster"](https://speakerdeck.com/tcnksm/coreoskurasutafalsedockerkontenafalsejian-shi-number-monitoringcasual) at [Monitoring Casual Talks #7](http://www.zusaar.com/event/9807003), [`Note`](/2015/01/monitoring-casual-7.md), [`slide`](/2015/01/)
 - ["A wakete infra engineer"](https://speakerdeck.com/tcnksm/aruruo-shou-inhuraenziniafalsexian-zhuang-que-ren-number-wakateinfra) at [Wakate Infra](), [`Note`](/2015/02/wakate-infra.md), [`slide`](/2015/02/wakate-infra.key)
-- ["Overview of CoreOS"]() at [CoreOS meetup Tokyo #1](http://coreos-meetup-tokyo.connpass.com/event/12596/), [`Note`](/2015/04/coreos-meetup-tokyo1.md), [`slide`](/2015/04/coreos-meetup-tokyo1.key)
+- ["Introduction of CoreOS"](https://speakerdeck.com/tcnksm/introduction-of-coreos-at-coreos-meetup-tokyo-number-1-number-coreosjp) at [CoreOS meetup Tokyo #1](http://coreos-meetup-tokyo.connpass.com/event/12596/), [`Note`](/2015/04/coreos-meetup-tokyo1.md), [`slide`](/2015/04/coreos-meetup-tokyo1.key)
 
 
 ### 2014
