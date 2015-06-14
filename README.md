@@ -13,7 +13,6 @@ This is my presentation slides. You can see most slides on [Speaker Deck](https:
 - ["A wakete infra engineer"](https://speakerdeck.com/tcnksm/aruruo-shou-inhuraenziniafalsexian-zhuang-que-ren-number-wakateinfra) at [Wakate Infra](), [`Note`](/2015/02/wakate-infra.md), [`slide`](/2015/02/wakate-infra.key)
 - ["Introduction of CoreOS"](https://speakerdeck.com/tcnksm/introduction-of-coreos-at-coreos-meetup-tokyo-number-1-number-coreosjp) at [CoreOS meetup Tokyo #1](http://coreos-meetup-tokyo.connpass.com/event/12596/), [`Note`](/2015/04/coreos-meetup-tokyo1.md), [`slide`](/2015/04/coreos-meetup-tokyo1.key)
 
-
 ### 2014
 
 - ["Docker ApplicationをDaaSにデプロイ"](https://speakerdeck.com/tcnksm/docker-applicationwodaasnidepuroi-number-dockerjp) at [Docker Meetup Tokyo #2](http://connpass.com/event/5640/), [`Slide`](/2014/04/docker-meetup-tokyo2.key)
