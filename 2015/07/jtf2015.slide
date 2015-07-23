@@ -18,7 +18,7 @@ wakateinfra
 - 新卒入社3年以内である
 - インフラに関わる仕事をしている
 
-異なる企業/異なる活動分野だったが，それぞれが具体的に何をしていて何に興味があるのか?を共有していこうということで集まり始めた
+異なる企業/異なる活動分野だったが，それぞれが具体的に何をしていて何に興味があるのか?を共有していこうということで集まり始めた．
 
 * Goal
 
@@ -27,12 +27,17 @@ wakateinfra
 
 を共有する
 
+* 質問
+
+tweetを拾えたら拾います [[https://twitter.com/search?q=%23wakateinfra&src=typd&vertical=default&f=tweets][#wakateinfra]]
+
 * Agenda
 
 - 自己紹介
 - 技術トレンドについて
 - 技術習得について
 - 今後のキャリアについて
+- まとめ
 
 * 自己紹介
 
@@ -47,18 +52,43 @@ wakateinfra
 
 - JTFで長らく語られてきたテーマ
 
-  コードの中のインフラ（Infrastructure as Programming）をスローガンに当イベントを開催いたします (JTF2013)
+  コードの中のインフラ（Infrastructure as Programming）をスローガンに当イベントを開催いたします(JTF2013)
 
 - 息を吐くようにサーバー設定をコードで書いてきた世代
 
-* Inrastructure as Code (question)
+* Infrastructure as Code (question)
 
-- プロビジョニングツール (Chef, Puppet, Ansible, Itamae) 何使ってる? どう?
+- プロビジョニングツール (Chef, Puppet, Ansible, Itamae) 何使ってる?
+- どんなところが良い? どんなところがイケてない?
 - これからどのようなプロビジョニングツールが登場すると嬉しい?
+
+* Infrastructure as Code
+
+プロビジョニングツール (Chef, Puppet, Ansible, Itamae) 何使ってる?
+
+  +============+======+========+=========+========+
+  |     -      | Chef | Puppet | Ansible | Itamae |
+  +============+======+========+=========+========+
+  | @y_uuki    | ○    |        | -       |        |
+  +------------+------+--------+---------+--------+
+  | @hfm       |      | ○      | -       | ○      |
+  +------------+------+--------+---------+--------+
+  | @catatsuy  |      |        | ○       |        |
+  +------------+------+--------+---------+--------+
+  | @rrreeeyyy | ○    |        | ○       | ○      |
+  +------------+------+--------+---------+--------+
+  | @deeet     | ○    |        | -       |        |
+  +------------+------+--------+---------+--------+
+  ○使っている / -少し触った
+
+- 少なくともChefかPuppetを使っている
+- Ansibleはとりあえずみんな手を出している
+- Itamaeが使われ始めている?
 
 * Container (background)
 
 - runC and Open Container Project
+.link http://deeeet.com/writing/2015/02/17/docker-bad-points/ Dockerの諸問題とRocket登場の経緯
 .link http://blog.docker.com/2015/06/runc/ Introducing runC: a lightweight universal container runtime | Docker Blog
 - kubernetes v1.0 and Cloud Native Computing Foundation
 .link http://googlecloudplatform.blogspot.jp/2015/07/Kubernetes-V1-Released.html Google Cloud Platform Blog: Kubernetes V1 Released - Cloud Native Computing Foundation to Drive Container Innovation
@@ -67,21 +97,57 @@ wakateinfra
 
 - コンテナ (Docker) 使ってる? どう使ってる? 
 - 使ってみてどうだった?
+- 2年後どうなってると思う?
 
 * 技術習得について
 * 技術習得について
 
-- 最新情報をどうやってキャッチアップしてる?
+- 最新情報をどうやってキャッチアップしてる? どうやって学んでる?
+
 - 最新技術追いすぎ問題についてどう思う?
 
 .link http://shunichi-arai.blogspot.jp/2015/07/it.html 流行のIT技術を追うのをやめたらプログラマとして成長した話
 .link http://anemone.dodgson.org/2015/07/13/a-million-hello-worlds/ A Million Hello Worlds - steps to phantasien
+
+* 最新技術
+
+どうやってキャッチアップしてる?
+
+- [[http://b.hatena.ne.jp/][はてなブックマーク]] (マイホットエントリー)
+- [[https://twitter][twitter]]
+- [[https://news.ycombinator.com/][Hacker News]]
+- [[http://feedly.com/][feedly]]
+
+どうやって学んでる?
+
+- 触ってみる
+- ソースが公開されていれば読む
+- 本を読む
+
+* 若者のオススメ情報源
+
+- _@y_uuki_: 
+- _@hfm_: 
+- _@catatsuy_: 
+- _@rrreeeyyy_: 
+- _@deeeet_: [[https://coreos.com/blog/][CoreOS Blog]] / [[https://influxdb.com/blog.html][InfluxDB Blog]] / [[https://twitter.com/kelseyhightower][@kelseyhightower]]
+
+* 最近読んだオススメ本
+
+- _@y_uuki_: 
+- _@hfm_: [[http://www.amazon.co.jp/dp/4862761712/ref=pd_lpo_sbs_dp_ss_1?pf_rd_p=187205609&pf_rd_s=lpo-top-stripe&pf_rd_t=201&pf_rd_i=1609949811&pf_rd_m=AN1VRQENFRJN5&pf_rd_r=0F6M4ZZDRT9VZE5XFJGC][問いかける技術――確かな人間関係と優れた組織をつくる]]
+- _@catatsuy_: 
+- _@rrreeeyyy_: 
+- _@deeeet_: [[http://www.amazon.co.jp/%E3%82%AA%E3%83%9A%E3%83%AC%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%81%AE%E4%BB%95%E7%B5%84%E3%81%BF-%E6%83%85%E5%A0%B1%E7%A7%91%E5%AD%A6%E3%81%93%E3%82%93%E3%81%9B%E3%81%B7%E3%81%A4-%E6%B2%B3%E9%87%8E-%E5%81%A5%E4%BA%8C/dp/4254127057/ref=sr_1_1?ie=UTF8&qid=1437665713&sr=8-1&keywords=%E3%82%AA%E3%83%9A%E3%83%AC%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%81%AE%E4%BB%95%E7%B5%84%E3%81%BF][オペレーティングシステムの仕組み]] / [[http://tatsu-zine.com/books/gcbook][ガベージコレクションのアルゴリズムと実装]]
+
 
 * 今後のキャリアについて
 * 今後のキャリアについて
 
 - 今後どのような仕事をしてみたい?
 - 今後どのようなことに挑戦してみたい?
+
+* まとめ
 
 
 
