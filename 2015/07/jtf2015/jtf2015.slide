@@ -1,0 +1,87 @@
+若手インフラエンジニアが語る　　技術トレンドと数年後の未来
+JTF2015
+26 Jul 2015
+
+wakateinfra
+
+* whoami(1)
+
+.image deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm*
+- 社内PaaSの開発運用
+- Docker, Golang, CloudFoundry, CoreOS
+
+
+* #wakateinfra ?
+
+- 新卒入社3年以内である
+- インフラに関わる仕事をしている
+
+異なる企業/異なる活動分野だったが，それぞれが具体的に何をしていて何に興味があるのか?を共有していこうということで集まり始めた
+
+* Goal
+
+- 若者は今のインフラ界隈をどう見ているのか
+- 若者はこれから何がしたいのか
+
+を共有する
+
+* Agenda
+
+- 自己紹介
+- 技術トレンドについて
+- 技術習得について
+- 今後のキャリアについて
+
+* 自己紹介
+
+* 技術トレンドについて
+
+* 技術トレンドについて
+
+- Infrastructure as Code
+- Container
+
+* Inrastructure as Code (background)
+
+- JTFで長らく語られてきたテーマ
+
+  コードの中のインフラ（Infrastructure as Programming）をスローガンに当イベントを開催いたします (JTF2013)
+
+- 息を吐くようにサーバー設定をコードで書いてきた世代
+
+* Inrastructure as Code (question)
+
+- プロビジョニングツール (Chef, Puppet, Ansible, Itamae) 何使ってる? どう?
+- これからどのようなプロビジョニングツールが登場すると嬉しい?
+
+* Container (background)
+
+- runC and Open Container Project
+.link http://blog.docker.com/2015/06/runc/ Introducing runC: a lightweight universal container runtime | Docker Blog
+- kubernetes v1.0 and Cloud Native Computing Foundation
+.link http://googlecloudplatform.blogspot.jp/2015/07/Kubernetes-V1-Released.html Google Cloud Platform Blog: Kubernetes V1 Released - Cloud Native Computing Foundation to Drive Container Innovation
+
+* Container (question)
+
+- コンテナ (Docker) 使ってる? どう使ってる? 
+- 使ってみてどうだった?
+
+* 技術習得について
+* 技術習得について
+
+- 最新情報をどうやってキャッチアップしてる?
+- 最新技術追いすぎ問題についてどう思う?
+
+.link http://shunichi-arai.blogspot.jp/2015/07/it.html 新井俊一のソフトウェアビジネスブログ: 流行のIT技術を追うのをやめたらプログラマとして成長した話
+.link http://anemone.dodgson.org/2015/07/13/a-million-hello-worlds/ A Million Hello Worlds - steps to phantasien
+
+* 今後のキャリアについて
+* 今後のキャリアについて
+
+- 今後どのような仕事をしてみたい?
+- 今後どのようなことに挑戦してみたい?
+
+
+
