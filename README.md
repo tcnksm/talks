@@ -12,6 +12,10 @@ This is my presentation slides. You can see most slides on [Speaker Deck](https:
 - ["Monitor Docker Containers on CoreOS Cluster"](https://speakerdeck.com/tcnksm/coreoskurasutafalsedockerkontenafalsejian-shi-number-monitoringcasual) at [Monitoring Casual Talks #7](http://www.zusaar.com/event/9807003), [`Note`](/2015/01/monitoring-casual-7.md), [`slide`](/2015/01/)
 - ["A wakete infra engineer"](https://speakerdeck.com/tcnksm/aruruo-shou-inhuraenziniafalsexian-zhuang-que-ren-number-wakateinfra) at [Wakate Infra](), [`Note`](/2015/02/wakate-infra.md), [`slide`](/2015/02/wakate-infra.key)
 - ["Introduction of CoreOS"](https://speakerdeck.com/tcnksm/introduction-of-coreos-at-coreos-meetup-tokyo-number-1-number-coreosjp) at [CoreOS meetup Tokyo #1](http://coreos-meetup-tokyo.connpass.com/event/12596/), [`Note`](/2015/04/coreos-meetup-tokyo1.md), [`slide`](/2015/04/coreos-meetup-tokyo1.key)
+- ["What I Talk About When I Talk About CLI Tool By Golang #gocon"](https://speakerdeck.com/tcnksm/what-i-talk-about-when-i-talk-about-cli-tool-by-golang-number-gocon), [`Slide`](/2015/06/gocon-summer.key)
+- ["How to Dev&Ops Internal PaaS"](https://speakerdeck.com/tcnksm/how-to-dev-and-ops-internal-paas), [`Slide`](/2015/06/hostingcasual2.key)
+- ["若手インフラエンジニアたちが語る技術トレンドと数年後の未来"](http://go-talks.appspot.com/github.com/tcnksm/talks/2015/07/jtf2015.slide#1), [`Slide`](2015/07/jtf2015.slide)
+
 
 ### 2014
 
