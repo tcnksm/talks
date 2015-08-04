@@ -1,0 +1,223 @@
+Go packages from Hashicorp
+Hashicorp meetup@Wantedly
+5 Aug 2015
+
+deeeet
+@deeeet
+http://deeeet.com/
+
+* About me
+
+.image deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm*
+- [[http://deeeet.com][http://deeeet.com]]
+- 社内PaaS（CloudFoundryを利用）の開発運用
+- （CFの中でConsulが採用される予定）
+
+* TL;DR
+
+[[https://github.com/hashicorp][Hashicorp]] / [[https://github.com/mitchellh][mitchellh]]氏が開発しているGo pacakgeを紹介する
+
+* Goal
+
+- Go言語を使ってるひと... このパッケージ良さそう!
+- Go言語を使ってないががHashicorpツールは使っているひと... Hashicorpツールで使われているものも多い．コードを追うときの参考に!
+
+
+* Packages
+
+自分が採用しているもの/触ったことのあるものを紹介する
+
+- [[https://github.com/mitchellh/cli][mitchellh/cli]]
+- [[https://github.com/mitchellh/go-homedir][mitchellh/go-homedir]]
+- [[https://github.com/mitchellh/colorstring][mitchellh/colorstring]]
+- [[https://github.com/hashicorp/logutils][hashicorp/logutils]]
+- [[https://github.com/mitchellh/panicwrap][mitchellh/panicwrap]]
+- [[https://github.com/mitchellh/mapstructure][mitchellh/mapstructure]]
+- [[https://github.com/mitchellh/copystructure][mitchellh/copystructure]]
+- [[https://github.com/hashicorp/go-immutable-radix][hashicorp/go-immutable-radix]]
+
+* mitchellh/cli
+
+サブコマンド付きのCLIツールを作るためのPackage．Hashicorpツール（e.g., [[https://packer.io/][packer]]，[[https://www.consul.io/][Consul]]，[[https://www.terraform.io/][Terraform]]）の基本の骨格はこのPackageによって作られている．記述は[[https://github.com/codegangsta/cli][codegangsta/cli]]より多いがテストしやすいなどGoに慣れてるならこちらの方が使いやすい(と思う)．
+
+以下のinterfaceを満たすようにサブコマンドを実装していく．
+
+  type Command interface {
+      // -h オプション(e.g., packer -h)で各サブコマンドの概要を一行で表示する．
+      // そこで出力する簡単なヘルプメッセージを記述する．
+      Synopsis() string
+
+      // より詳細なヘルプメッセージを記述する．
+      // e.g., packer build -h
+      Help() string
+
+      // 実際のコマンドを記述する．引数([]string)を受け取り終了ステータスを返す．
+      Run(args []string) int      
+  }
+
+* mitchellh/cli
+
+Hashicorpツールならcommand/ディレクトリ以下に各サブコマンドのinterface実装がある
+
+  $ cd $GOPATH/src/github.com/mitchellh/packer
+  $ ls command/
+    build.go       command_test.go  fix_test.go  meta.go  push_test.go   validate.go   
+    build_test.go  fix.go           inspect.go   push.go  test-fixtures  validate_test.go
+
+（コードを読むときはここから始めれば良い）
+
+* mitchellh/go-homedir
+
+Homeディレクトリを取得するためのPackage．グローバルな設定ファイルをHomeディレクトリに置きたい場合などに使える．
+
+標準パッケージでももちろん取得できるが[[https://golang.org/cmd/cgo/][cgo]]に依存しておりクロスコンパイルすると実行時に死ぬ．
+
+  userInfo, _ := user.Current()
+  userInfo.HomeDir
+
+go-homedirは環境変数などを利用してOSの差分を吸収する．
+
+  homedir.Dir()
+
+* mitchellh/colorstring
+
+コンソールへのアウトプットに色付けをするためのPackage．シンプルなinline syntaxが使える．
+
+  text := `
+    [red]colorstring[reset] is a [blue][bold]Go[reset] library for outputting colored strings
+    to a console. using a simple inline syntax in your string to specify the color to print as.
+  `
+  colorstring.Fprintf(os.Stdout, text)
+
+.image colorstring.png _ 900
+
+* hashicorp/logutils
+
+標準のlog packageにログレベルを設定できるようにする．サードパーティのlogパッケージはたくさんある．が，どれも重すぎたりする... logutilsはその中でも軽くて良い
+
+  filter := &logutils.LevelFilter{
+      Levels: []logutils.LogLevel{"DEBUG", "WARN", "ERROR"}, // ログレベルの定義
+      MinLevel: logutils.LogLevel("WARN"), // ログレベルの設定
+      Writer: os.Stderr,
+  }  
+  // フィルターとして標準のlogパッケージに登録するだけ
+  log.SetOutput(filter) 
+  
+  log.Print("[DEBUG] Debugging") // ログレベルはWARNなので表示されない
+  log.Print("[WARN] Warning")    // 表示される 🙆
+  log.Print("[ERROR] Erring")    // 表示される 🙆
+
+* mitchellh/panicwrap
+
+Panicが発生した際にコマンドを再実行するしあらかじめ登録しておいたHanlder関数を実行する（リカバーできるわけではない）．
+
+どう使うのが良い?
+
+- Panic時のStacktraceを表示するのではなくよりHelpfulな表示を行う．
+- どのような状況でPanicが発生したかを詳細に記録する．
+
+
+* mitchellh/panicwrap
+
+もっとも単純な使い方．
+
+  func main() {
+      // (1) Handler(panicが発生したときに実行する)を登録する．
+      exitStatus, _ := panicwrap.BasicWrap(handler)
+
+      // (2) Panicが発生した場合はexitStatusは0以上の値になりここで終了する．
+      if exitStatus >= 0 {
+          os.Exit(exitStatus)
+      }
+
+      // (3) 通常のコマンドの実装
+      panic("Panic happend here...")
+  }
+
+  func handler(output string) {
+      f, _ := os.Create("crash.log")
+      fmt.Fprintf(f, "The child panicked!\n\n%s",output)
+      os.Exit(1)
+  }
+
+(参考: [[http://deeeet.com/writing/2015/04/17/panicwrap/][Go言語のCLIツールのpanicをラップしてクラッシュレポートをつくる | SOTA]])
+
+
+* mitchellh/mapstructure (reflect技1)
+
+Genericなmap(map[string]interface{})を特定のstructにDecodeするためのPackage．
+
+*なぜ?* ... データ(e.g., JSON)の構造があらかじめ分かっていれば標準パッケージでそれをDecodeするのは容易いが，構造が不明確な場合は厳しくなる．この場合Decodeが2回必要になる．1回目のDecodeでそのデータの構造（種類）を判別し2回目に特定のStructへDecodeする．mapstructureはこれを簡単にする．
+
+Hashicorpツールでは設定ファイルやAPIのDecodeで多用されている．
+
+* mitchellh/mapstructure (reflect技1)
+
+シンプルな例（より複雑なデータ構造でもっと威力を発揮しそう）．
+
+  type Person struct {
+      Name   string
+      Age    int
+      Emails []string
+      Extra  map[string]string
+  }
+
+  // 構造が不明のデータ(e.g., JSON)．map[string]interface{}としてDecodeしておく．
+  input := map[string]interface{}{
+      "name":   "Mitchell",
+      "age":    91,
+      "emails": []string{"one", "two", "three"},
+      "extra": map[string]string{
+          "twitter": "mitchellh",
+      },
+  }
+
+  var result Person
+  _ := Decode(input, &result)
+  
+  fmt.Printf("%#v", result)
+
+
+* mitchellh/copystructure (reflect技2)
+
+mapやslice，pointerといった参照型の値のDeep Copyを行うPackage．
+
+  input := map[string]interface{}{
+      "bob": map[string]interface{}{
+          "emails": []string{"a", "b"},
+       },
+  }
+
+  dup, _ := Copy(input)
+
+  fmt.Printf("%#v", dup)
+
+
+[[https://www.terraform.io/][Terraform]]のConfigオブジェクトのコピーに使われている．
+
+* hashicorp/go-immutable-radix
+
+[[https://ja.wikipedia.org/wiki/%E5%9F%BA%E6%95%B0%E6%9C%A8][基数木（Radix tree）]]のGo実装．トライ木とは異なりは1つの文字だけでなく文字の並びがラベルとして付与される．集合が小さい場合（特に長い文字列の集合）や長い接頭部を共有する文字列の集合などで効果を発揮する（ファイルシステムとか）．
+
+  r := iradix.New()
+  r, _, _ = r.Insert(([]byte)("foo/"), "read")
+  r, _, _ = r.Insert(([]byte)("bar/"), "write")
+  r, _, _ = r.Insert(([]byte)("foo/bar"), "write")
+
+  _, policy, ok := r.Root().LongestPrefix([]byte("foo/zip"))
+  if ok {
+      fmt.Println(policy) // read
+  }
+
+[[][Consul]]でACLのkeyのLoolupに使われている（[[https://github.com/armon/go-radix][armon/go-radix]]）
+
+
+* 他にも
+
+- [[https://github.com/mitchellh/ioprogress][mitchellh/ioprogress]]
+- [[https://github.com/mitchellh/reflectwalk][mitchellh/reflectwalk]]
+- [[https://github.com/hashicorp/memberlist][hashicorp/memberlist]]
+- [[https://github.com/hashicorp/raft][hashicorp/raft]]
+- [[https://github.com/hashicorp/yamux][hashicorp/yamux]]
