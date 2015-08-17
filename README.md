@@ -1,11 +1,18 @@
 Talks
 ====
 
-This is my presentation slides. You can see most slides on [Speaker Deck](https://speakerdeck.com/)
+This is my presentation slides or podacst shownotes. You can see most slides on [Speaker Deck](https://speakerdeck.com/)
 
 ## Table of Contents
 
 ### 2015
+
+#### Podcast
+
+- [Rebuild: 83: Living In A Container](http://rebuild.fm/83/)
+- [Rebuild: Aftershow 83: Security Updates For Murakami](http://rebuild.fm/83a/)
+
+#### Conference
 
 - ["Deploy Docker Containers on CoreOS Cluster"](https://speakerdeck.com/tcnksm/coreoskurasutanidockerkontenawodepuroi-number-dockerjp) at [Docker Meetup Tokyo #4](http://connpass.com/event/10318/), [`Note`](/2015/01/docker-meetup-tokyo4.md), [`Slide`](/2015/01/docker-meetup-tokyo4.key)
 - ["Monitor Docker Containers on CoreOS Cluster"](https://speakerdeck.com/tcnksm/coreoskurasutafalsedockerkontenafalsejian-shi-number-monitoringcasual) at [Monitoring Casual Talks #7](http://www.zusaar.com/event/9807003), [`Note`](/2015/01/monitoring-casual-7.md), [`Slide`](/2015/01/)
