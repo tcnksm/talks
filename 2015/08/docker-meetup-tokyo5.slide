@@ -1,0 +1,62 @@
+boot2kubernetes
+Docker Meetup Tokyo #5 (LT)
+19 Aug 2015
+
+deeeet
+@deeeet
+http://deeeet.com/
+
+* About me
+
+.image deeeet.png 200 _
+
+- *@deeeet* (twitter) / *@tcnksm* (github)
+- [[http://deeeet.com][http://deeeet.com]]
+- PaaS engineer (Using CloudFoundry)
+
+* TL;DR
+
+Introduction of my recent project [[https://github.com/tcnksm/boot2kubernetes][tcnksm/boot2kubernetes]]
+
+* Agenda
+
+- What is boot2kubernetes?
+- Why did you build this?
+- Inside boot2kubernetes
+- DEMO
+
+* What is boot2kubernetes?
+
+Run single node kubernetes cluster in *one* *command* using docker 🐳
+
+   $ boot2k8s up
+
+Just this, it pulls required docker images and starts them. 
+
+If you run docker on boot2kubernetes-vm, you need port forwarding for connecting api server via `kubectl`. `boot2k8s` automatically detects that and starts proxy server.
+
+And easy to clean everything,
+
+   $ boot2k8s destroy   
+
+* Why did you build this?
+
+Becasue kubernetes has reached the v1 milestone 🎉, it's good time to start!
+
+It's important that:
+
+- Anyone can try it more easily 
+- Anyone can build test environment more quickly
+
+* Inside boot2kubernetes 
+
+boot2kubernetes is written by Go.
+
+I experimentally [[https://github.com/docker/libcompose][docker/libcompose]] (& [[https://github.com/jteeuwen/go-bindata][jtweeuwen/go-bindata]] ). `libcompose` is official golang implementation of docker-compose and we can use it as library from our code.
+
+* Inside boot2kubernetes (Comopose file)
+
+
+* DEMO
+
+
