@@ -52,26 +52,53 @@ It's important that:
 
 boot2kubernetes is written by Go.
 
-I experimentally [[https://github.com/docker/libcompose][docker/libcompose]] (& [[https://github.com/jteeuwen/go-bindata][jtweeuwen/go-bindata]] ). `libcompose` is official golang implementation of docker-compose and we can use it as library from our code.
+I experimentally [[https://github.com/docker/libcompose][docker/libcompose]] (& [[https://github.com/jteeuwen/go-bindata][jtweeuwen/go-bindata]] ). `libcompose` is official golang implementation of docker-compose. We can also use it as library from our code.
 
 * Inside boot2kubernetes (Comopose file)
 
   etcd:
-  image: gcr.io/google_containers/etcd:2.0.9
-  net: host
-  command: /usr/local/bin/etcd --addr=127.0.0.1:4001 --bind-addr=0.0.0.0:4001 --data-dir=/var/etcd/data
-master:
-  image: gcr.io/google_containers/hyperkube:v0.21.2
-  net: host
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-  command: /hyperkube kubelet --api_servers=http://localhost:8080 --v=2 --address=0.0.0.0 --enable_server --hostname_override=127.0.0.1 --config=/etc/kubernetes/manifests
-proxy:
-  image: gcr.io/google_containers/hyperkube:v0.21.2
-  net: host
-  privileged: true
-  command: /hyperkube proxy --master=http://127.0.0.1:8080 --v=2
+    image: gcr.io/google_containers/etcd:2.0.9
+    net: host
+    command: /usr/local/bin/etcd --addr=127.0.0.1:4001 --bind-addr=0.0.0.0:4001 --data-dir=/var/etcd/data
+  master:
+    image: gcr.io/google_containers/hyperkube:v0.21.2
+    net: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: /hyperkube kubelet --api_servers=http://localhost:8080 --v=2 --address=0.0.0.0 --enable_server --hostname_override=127.0.0.1 --config=/etc/kubernetes/manifests
+  proxy:
+    image: gcr.io/google_containers/hyperkube:v0.21.2
+    net: host
+    privileged: true
+    command: /hyperkube proxy --master=http://127.0.0.1:8080 --v=2
+
+* Inside boot2kubenetes (libcompose & go-bindata)
+
+Convert compose file (`k8s.yml`) into managable Go source code by go-bindata, 
+
+  $ go-bindata k8s.yml # this generates bindata.go
+
+Read it and start containers by libcompose,
+
+  // Read compose file via bindata.go
+  compose, _ := config.Asset("k8s.yml")
+
+  // Setup new docker-compose project
+  context := &docker.Context{
+      Context: project.Context{
+          ComposeBytes: compose,
+          ProjectName:  "boot2k8s",
+      },
+  }
+
+  project, _ := docker.NewProject(context)
+
+  project.Up() // Start kubernetes cluster 🙆
+
 
 * DEMO
 
+* Future
+
+- Integrate with `docker-machine` (We can run k8s where we want)
 
