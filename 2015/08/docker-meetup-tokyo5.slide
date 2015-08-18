@@ -72,6 +72,8 @@ I experimentally [[https://github.com/docker/libcompose][docker/libcompose]] (& 
     privileged: true
     command: /hyperkube proxy --master=http://127.0.0.1:8080 --v=2
 
+[[https://github.com/kubernetes/kubernetes/blob/release-1.0/docs/getting-started-guides/docker.md][Running Kubernetes locally via Docker]]
+
 * Inside boot2kubenetes (libcompose & go-bindata)
 
 Convert compose file (`k8s.yml`) into managable Go source code by go-bindata, 
