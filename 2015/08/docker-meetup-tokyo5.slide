@@ -33,7 +33,7 @@ Run single node kubernetes cluster in *one* *command* using docker 🐳
 
 Just this, it pulls required docker images and starts them. 
 
-If you run docker on boot2kubernetes-vm, you need port forwarding for connecting api server via `kubectl`. `boot2k8s` automatically detects that and starts proxy server.
+If you run docker on boot2docker-vm, you need port forwarding for connecting api server via `kubectl`. `boot2k8s` automatically detects that and starts proxy server for you.
 
 And easy to clean everything,
 
@@ -52,7 +52,7 @@ It's important that:
 
 boot2kubernetes is written by Go.
 
-I experimentally [[https://github.com/docker/libcompose][docker/libcompose]] (& [[https://github.com/jteeuwen/go-bindata][jtweeuwen/go-bindata]] ). `libcompose` is official golang implementation of docker-compose. We can also use it as library from our code.
+I experimentally use [[https://github.com/docker/libcompose][docker/libcompose]] (& [[https://github.com/jteeuwen/go-bindata][jtweeuwen/go-bindata]] ). `libcompose` is official golang implementation of docker-compose. We can also use it as library from our code.
 
 * Inside boot2kubernetes (Comopose file)
 
