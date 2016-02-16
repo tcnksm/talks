@@ -66,15 +66,11 @@ Release timeline:
 - [[https://talks.golang.org/2015/state-of-go.slide#8][Go 1.5]] released 19th August, 2015
 - Go 1.6 is expected to be released February, 2016
 
-* Supported platforms
+* New ports
 
-Go 1.6 supports the following operating systems:
+Experimental ports to Linux on 64-bit MIPS (linux/mips64 and linux/mips64le).
 
-- Windows, OSX (darwin), Android, iOS, NaCl, DragonflyBSD, FreeBSD, Linux, NetBSD, OpenBSD, Plan 9, Solaris/Illumos
-
-Go 1.6 supports the following CPU architectures:
-
-- Intel (386 and amd64), arm (ARMv5, v6, v7), arm64, 64 bit PowerPC (big and little endian), 64 bit MIPS (big and little endian)
+Experimental port to Android on 32-bit x86 (android/386).
 
 In the future:
 
@@ -129,7 +125,7 @@ Read more
 
 * Stripping whitespace with text/template
 
-It is now possible to trim spaces around template actions, which can make template definitions more readable.
+It is now possible to trim whitespaces around template actions, which can make template definitions more readable.
 
 A minus sign at the beginning of an action says to trim space before the action, and a minus sign at the end of an action says to trim space after the action.
 
@@ -316,6 +312,8 @@ It can be disabled explicitly by setting the GO15VENDOREXPERIMENT environment va
 
 The most likely problem caused by enabling vendoring by default happens in source trees containing an existing directory named vendor that does not expect to be interpreted according to new vendoring semantics. In this case, the simplest fix is to rename the directory to anything other than vendor and update any affected import paths.
 
+[[http://deeeet.com/writing/2015/06/26/golang-dependency-vendoring/][Go言語のDependency/Vendoringの問題と今後．gbあるいはGo1.5]]
+
 * Vendored code matches ./...
 
 If you're used to doing
@@ -339,19 +337,17 @@ Read More
 
 * Sharing pointers between Go and C
 
-The major change is the definition of rules for sharing Go pointers with C code, to ensure that such C code can coexist with Go's garbage collector.
+cgo continues to get stricter about sharing data between Go and C.
 
-Go and C may share memory allocated by Go when
+In short:
 
-- a pointer to that memory is passed to C as part of a cgo call,
-- and provided that the memory itself contains no pointers to Go-allocated memory,
-- and provided that C does not retain the pointer after the call returns.
+- Go can pass a pointer to C
+- The referenced memory can't have pointers to Go allocated memory (Not allowed to pass Go pointer to Go pointer)
+- C can't keep pointers to the memory after the call returns
 
 These rules are checked by the runtime during program execution: if the runtime detects a violation, it prints a diagnosis and crashes the program.
 
 The checks can be disabled by setting the environment variable `GODEBUG=cgocheck=0`, but note that disabling the checks will typically only lead to more mysterious failure modes.
-
-Fixing the code in question should be strongly preferred over turning off the checks.
 
 * Sharing pointers between Go and C (cont.)
 
@@ -383,15 +379,6 @@ Go 1.6 continues to accept the old syntax and print the warning.
 
 Go 1.7 will remove support for the old syntax.
 
-* LLVM memory sanitizer, -msan
-
-The compiler, linker, and go command have new flag `-msan`, analogous to `-race` that enables interoperation with the Clang MemorySanitizer.
-
-Such interoperation useful mainly for testing a program containing suspect C or C++ code.
-
-    go build -msan $YOURCOMMAND
-
-This should probably be considered _experimental_ and only available on linux/amd64.
 
 * Performance
 

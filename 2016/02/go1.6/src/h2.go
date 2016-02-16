@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	certFile, _ := filepath.Abs("certificate/server.crt")
-	keyFile, _ := filepath.Abs("certificate/server.key")
+	certFile, _ := filepath.Abs("src/certificate/server.crt")
+	keyFile, _ := filepath.Abs("src/certificate/server.key")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Protocol: %s\n", r.Proto)
