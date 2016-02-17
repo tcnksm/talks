@@ -36,9 +36,18 @@ Packages
 
 Today (Feb 17th) is an attempt at a release party for Go 1.6 involving as many Go user groups as possible.
 
+* Welcome
+
+パーティー失敗
+
+
+* Welcome
+
+
 There are NNN Go user groups taking part, you can find [[https://github.com/golang/go/wiki/Go-1.6-release-party#whos-involved][a list of them here]].
 
-This presentation is based _heavily_ on the [[http://tip.golang.org/doc/go1.6][official Go 1.6 release notes]] and forked from [[http://talks.godoc.org/github.com/davecheney/gosyd/go1.6.slide][talks.godoc.org/github.com/davecheney/gosyd/go1.6.slide]] (by @davecheney). 
+This presentation is based _heavily_ on the [[http://tip.golang.org/doc/go1.6][official Go 1.6 release notes]] and forked from [[http://talks.godoc.org/github.com/davecheney/gosyd/go1.6.slide][talks.godoc.org/github.com/davecheney/gosyd/go1.6.slide]] (by @davecheney).
+
 
 * Go 1.6
 
