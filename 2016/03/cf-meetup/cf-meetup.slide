@@ -1,0 +1,39 @@
+Recent my cf-plugins
+Cf meetup
+31 Mar 2016
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[http://deeeet.com][http://deeeet.com]]
+- CloudFoundry Dev&Ops in Rakuten
+
+* Love Golang
+
+Tools
+
+- [[https://github.com/tcnksm/gcli][gcli]] - The easy way to build Golang command-line application
+- [[https://github.com/tcnksm/gotests][gotests]] - A tool to generate Go test functions from the given source code like gofmt
+- [[https://github.com/tcnksm/ghr][ghr]] - Create Github Release and upload artifacts in parallel
+- [[https://github.com/tcnksm/license][license]] - Generate LICENSE file you want
+- kafka-firehose-nozzle (Coming soon) - Integrate CloudFoundry with [[http://kafka.apache.org/][Apache Kafka]]
+
+Packages
+
+- [[https://github.com/tcnksm/go-input][go-input]] - Go package for ideal tty prompt
+- [[https://github.com/tcnksm/go-latest][go-latest]] - Simple way to check version is latest or not from various sources in Go
+
+* Cf plugins
+
+- [[https://github.com/tcnksm/cf-plugin-local-push][cf-plugin-local-push]]
+- [[https://github.com/tcnksm/cf-plugin-update-cli][cf-plugin-update-cli]]
+
+* local-push
+* update-cli
+* Tips: good plugin
+
