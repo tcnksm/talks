@@ -1,5 +1,5 @@
-Recent my cf-plugins
-Cf meetup
+cf-plugins local-push, update-cli
+Cf meetup at Tokyo
 31 Mar 2016
 
 Taichi Nakashima
@@ -9,11 +9,11 @@ Taichi Nakashima
 
 .image img/deeeet.png 200 _
 
-- *@deeeet* / *@tcnksm* (GitHub)
+- *@deeeet* (Twitter) / *@tcnksm* (GitHub)
 - [[http://deeeet.com][http://deeeet.com]]
 - CloudFoundry Dev&Ops in Rakuten
 
-* Love Golang
+* Love golang
 
 Tools
 
@@ -34,6 +34,131 @@ Packages
 - [[https://github.com/tcnksm/cf-plugin-update-cli][cf-plugin-update-cli]]
 
 * local-push
+
+* local-push
+
+`local-push` allows you to push your CF application to your local docker container with actual buildpacks 🐳
+
+* local-push
+
+_DEMO_
+
+.image img/local-push.gif 500 _
+
+* local-push
+
+User?
+
+- Application developer who deploys & runs their service on CF
+
+Why?
+
+Application developer (at least me) wants *debug* application on own PC
+
+- It's fast
+- You can prepare test data and break it
+
+* local-push vs. Others
+
+BOSH Lite?
+
+- It's very very heavy
+- It's for who operates CF. Not for application developer
+
+Nanocf?
+
+  $ docker images 
+  sclevine/nanocf  latest  f9b2dcf78699  4 weeks ago 7.43 GB
+
+- It's also heavy
+- You don't need all components
+
+Don't provide bad experience to user.
+
+* How local-push works? (1/2)
+
+In one word, `local-push` emulates DEA environment with docker and cf-buildpack.
+
+0. Bulding base docker image: `tcnksm/cf-buildstep`
+
+- Forked `progrium/buildstep`
+- Base image is `cloudfoundry/cflinuxfs2` (Same as DEA)
+- Installing cf-buidpacks
+
+(It's already uploaded on docker registry)
+
+* How local-push works? (2/2)
+
+1. Building docker image (tcnksm/local-push)
+
+- Add application code
+- Fetch dependencies and compile application with buildpack
+
+2. Run container
+
+- `docker run -p 8080:8080 -e PORT=8080 tcnkms/local-push`
+
+* Benefit?
+
+- Very light-weight ( base image size is around `1.1` GB )
+- Extreamly fast build & boot by docker cache function
+- Login to container and see what's happening by `docker exec`
+
+* Install
+
+Use `install-plugin` command,
+
+  $ cf add-plugin-repo tcnksm https://t-plugins.au-syd.mybluemix.net
+  $ cf install-plugin -r tcnksm local-push
+
+* Next step?
+
+- Interact with DB or MQ
+- Integrate with LB (sending special header)
+- Parse `manifest.yml`
+
 * update-cli
-* Tips: good plugin
+
+* update-cli
+
+`update-cli` allows you to update cf/cli to the latest version.
+
+* update-cli
+
+_DEMO_
+
+.image img/update-cli.gif 500 _
+
+* update-cli
+
+Why?
+
+I want this function on cf/cli itself. Kind of proposal to show how it great.
+
+* How update-cli work?
+
+Core of this plugin is [[https://github.com/tcnksm/go-latest][tcnksm/go-latest]]
+
+  githubTag := &latest.GithubTag{
+      Owner: "cloudfoundry",
+      Repository: "cli",
+  }
+
+  res, _ := latest.Check(githubTag, "0.1.0")
+  if res.Outdated {
+    fmt.Printf("0.1.0 is not latest, you should upgrade to %s", res.Current)
+  }
+
+* Install
+
+Use `install-plugin` command,
+
+  $ cf add-plugin-repo tcnksm https://t-plugins.au-syd.mybluemix.net
+  $ cf install-plugin -r tcnksm update-cli
+
+
+* Tips: how to write good plugin
+
+
+
 
