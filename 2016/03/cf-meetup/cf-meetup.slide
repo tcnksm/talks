@@ -1,5 +1,5 @@
 cf-plugins local-push, update-cli
-Cf meetup at Tokyo
+CF meetup at Tokyo
 31 Mar 2016
 
 Taichi Nakashima
@@ -33,11 +33,16 @@ Packages
 - [[https://github.com/tcnksm/cf-plugin-local-push][cf-plugin-local-push]]
 - [[https://github.com/tcnksm/cf-plugin-update-cli][cf-plugin-update-cli]]
 
-* local-push
+* Cf plugins
+
+- cf/cli has functionality
+- cf plugins enable developers to add custom commands to the cf/cli
 
 * local-push
 
-`local-push` allows you to push your CF application to your local docker container with actual buildpacks 🐳
+* local-push
+
+`local-push` allows you to push your CF application to your local docker container with buildpacks 🐳
 
 * local-push
 
@@ -47,7 +52,7 @@ _DEMO_
 
 * local-push
 
-User?
+Target user?
 
 - Application developer who deploys & runs their service on CF
 
@@ -56,7 +61,8 @@ Why?
 Application developer (at least me) wants *debug* application on own PC
 
 - It's fast
-- You can prepare test data and break it
+- You can play with test data and break it
+- You can see what buildpack does
 
 * local-push vs. Others
 
@@ -67,13 +73,8 @@ BOSH Lite?
 
 Nanocf?
 
-  $ docker images 
-  sclevine/nanocf  latest  f9b2dcf78699  4 weeks ago 7.43 GB
-
-- It's also heavy
+- It's also heavy (`7.4GB`)
 - You don't need all components
-
-Don't provide bad experience to user.
 
 * How local-push works? (1/2)
 
@@ -96,6 +97,7 @@ In one word, `local-push` emulates DEA environment with docker and cf-buildpack.
 
 2. Run container
 
+- Parse `Procfile`
 - `docker run -p 8080:8080 -e PORT=8080 tcnkms/local-push`
 
 * Benefit?
@@ -115,7 +117,7 @@ Use `install-plugin` command,
 
 - Interact with DB or MQ
 - Integrate with LB (sending special header)
-- Parse `manifest.yml`
+- Parse `manifest.yml` ([[https://github.com/tcnksm/go-cf-manifest][tcnksm/cf-go-manifest]])
 
 * update-cli
 
@@ -133,7 +135,7 @@ _DEMO_
 
 Why?
 
-I want this function on cf/cli itself. Kind of proposal to show how it great.
+I want this function on cf/cli itself. Kind of proposal to show how it useful.
 
 * How update-cli work?
 
@@ -156,8 +158,10 @@ Use `install-plugin` command,
   $ cf add-plugin-repo tcnksm https://t-plugins.au-syd.mybluemix.net
   $ cf install-plugin -r tcnksm update-cli
 
+* Next time?
 
-* Tips: how to write good plugin
+- How to write good cf plugins
+
 
 
 
