@@ -80,7 +80,7 @@ PaaSの運用者に対して
 
 * Problem
 
-- ログの保存先が2つに分散してしまっていた（syslogサーバー + GlusterFS）．問題があった時に複数のサーバーにログインする必要があった
+- ログの保存先が2つに分散してしまった（syslogサーバー + GlusterFS）．問題があった時に複数のサーバーにログインする必要があった
 - ログの詰まりとその伝搬が発生した（upstreamが管轄外の場合は何もできない）
 - ユーザが使いたいログ解析ツールの対応が大変だった（Logstash or Flume etc...）
 - GlusterFS... 🔥
@@ -101,12 +101,14 @@ x2Kafka
 
 - [[http://www.rsyslog.com/doc/master/configuration/modules/omkafka.html][rsyslog/omkafka]] (C/C++のライブラリ[[https://github.com/edenhill/librdkafka][edenhill/librdkafka]]を利用)
 - [[https://github.com/rakutentech/kafka-firehose-nozzle][rakutentech/kafka-firehose-nozzle]] (Golangのパッケージ[[https://github.com/Shopify/sarama][Shopify/sarama]]を利用)
+- Kafka ? (e.g., ネットワークチーム)
 
 Kafka2x
 
 - [[https://github.com/pinterest/secor][pinterest/secor]] (Azure blob storeに対応 [[https://github.com/pinterest/secor/pull/194][#194]])
 - ELK
 - [[http://riemann.io/][riemann]] + [[https://influxdata.com/][InfluxDB]] + [[http://grafana.org/][Grafana]] (メトリクス)
+- Kafka ? （e.g., データ解析チーム or アプリケーションチーム）
 
 * Future work
 
