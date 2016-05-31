@@ -11,7 +11,7 @@ Taichi Nakashima
 
 - *@deeeet* (Twitter) / *@tcnksm* (GitHub)
 - [[http://deeeet.com][http://deeeet.com]]
-- PaaS (based on Cloud Foundry) Dev&Ops at Rakuten
+- PaaS (based on Cloud Foundry) Dev&Ops 
 - Gopher
 
 * About me
@@ -21,9 +21,7 @@ Taichi Nakashima
 * TL;DR
 
 - なぜLog pipelineの構築にApache Kafkaを採用したか?
-- どのようにCloudFoundryと連携しているのか?
-
-cf. [[http://techblog.rakuten.co.jp/2016/01/28/rakuten-paas-kafka/][Rakuten Platform as a Service and Apache Kafka | Rakuten Tech Blog]]
+- (どのようにCloudFoundryと連携しているのか?)
 
 * Cloud Foundry
 
@@ -41,14 +39,6 @@ Cloud Foundryのワークフロー
     $ cf scale APP -i 4          # アプケーションのスケール
     $ cf logs APP                # ログ(stdout/stderr)の確認
     $ cf cf bind-service APP DB  # DBサービスの利用
-
-* Cloud Foundry at Rakuten
-
-- 5年間運用 ([[https://cfsummit2016.sched.org/event/6aM0/five-years-of-cloud-foundry-at-rakuten-carlo-alberto-ferraris-ronak-banka-rakuten-inc][Five years of Cloud Foundry at Rakuten]])
-- テストだけではなく本番のアプリケーションのデプロイにも利用
-- サーバー構築コストの低減 + デプロイ/ワークフローの統一化
-- v1 -> v2 への移行（中）
-- Log pieplineも同時に再構築
 
 * Why log pipeline?
 
