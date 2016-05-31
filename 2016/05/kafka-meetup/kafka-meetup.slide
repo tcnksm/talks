@@ -30,8 +30,10 @@ cf. [[http://techblog.rakuten.co.jp/2016/01/28/rakuten-paas-kafka/][Rakuten Plat
 [[https://www.cloudfoundry.org/][https://www.cloudfoundry.org/]]
 
 - OSS Platform as a Service 構築基盤
-- テストだけではなく本番のアプリケーションのデプロイにも利用
-- サーバー構築コストの低減 + デプロイ/ワークフローの統一化
+- APIやルータ，CLIツール，ヘルスチェック，認証機構etc
+- Heroku buildpackを利用し様々なruntimeに対応
+- Docker imageのデプロイにも対応（root FSの利用）
+- v1 (Ruby) -> v2 (Golang)
 
 Cloud Foundryのワークフロー
 
@@ -40,7 +42,13 @@ Cloud Foundryのワークフロー
     $ cf logs APP                # ログ(stdout/stderr)の確認
     $ cf cf bind-service APP DB  # DBサービスの利用
 
-(heroku buildpackを利用し様々なruntimeに対応)
+* Cloud Foundry at Rakuten
+
+- 5年間運用 ([[https://cfsummit2016.sched.org/event/6aM0/five-years-of-cloud-foundry-at-rakuten-carlo-alberto-ferraris-ronak-banka-rakuten-inc][Five years of Cloud Foundry at Rakuten]])
+- テストだけではなく本番のアプリケーションのデプロイにも利用
+- サーバー構築コストの低減 + デプロイ/ワークフローの統一化
+- v1 -> v2 への移行（中）
+- Log pieplineも同時に再構築
 
 * Why log pipeline?
 
@@ -62,7 +70,11 @@ PaaSの運用者に対して
 - アプリケーションログ - ユーザがpushしたアプケーションが生成するログ
 - コンポーネントログ - Cloud Foundryのコンポーネント（e.g., API）が生成するログ
 
-* V1
+(2000 instances + 5TB logs / day)
+
+* v1 -> v2
+
+* v1
 
 .image  http://techblog.rakuten.co.jp/images/cfv1.jpeg 400 _
 
@@ -71,13 +83,11 @@ PaaSの運用者に対して
 - ログの保存先が2つに分散してしまっていた（syslogサーバー + GlusterFS）．問題があった時に複数のサーバーにログインする必要があった
 - ログの詰まりとその伝搬が発生した（upstreamが管轄外の場合は何もできない）
 - ユーザが使いたいログ解析ツールの対応が大変だった（Logstash or Flume etc...）
-- GlusterFS... 🔥 
+- GlusterFS... 🔥
 
-* V2
+* v2
 
-.image  http://techblog.rakuten.co.jp/images/cfv2.jpeg 400 _
-
-# TODO: Replace LeoFS with Amazon Azure
+.image img/cfv2.jpeg 400 _
 
 * Benefits
 
@@ -101,6 +111,3 @@ Kafka2x
 * Future work
 
 .image  http://techblog.rakuten.co.jp/images/multi-dc.jpeg 400 _
-
-* Conclusion
-
