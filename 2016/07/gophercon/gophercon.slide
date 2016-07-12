@@ -36,13 +36,13 @@ G(enerate)CLI
 
 Generate a skeleton (codes and its directory structure) project you need to start building CLI application right out of the box.
 
-You can choose famous CLI framework like [[https://github.com/urfave/cli][codegangsta/cli]] (now `urfave/cli`), [[https://github.com/mitchellh/cli][mitchellh/cli]] and so on. You can also generate without framework, same struct and methond go command has.
+You can choose a famous CLI framework like [[https://github.com/urfave/cli][codegangsta/cli]] (now `urfave/cli`), [[https://github.com/mitchellh/cli][mitchellh/cli]] and so on. You can also generate without framework, same struct and methond go command has.
 
 *Why?*
 
 # When you write CLI application in Golang,
 # you may notice everytime you're writing a lot of boilerplate codes.
-# For example, subcommand interface definition is always same, right ?
+# For example, subcommand interface definition is always same, just name is different, right ?
 #
 # I want to avoid writing common code everytime, 
 # and focus on function part.
@@ -56,7 +56,7 @@ To focus on function part of application instead of writing the chunk of boilerp
 # Let me show a simple demo
 # In this demo, I will generate
 
-_DEMO_ - generating `todo` CLI application which has `add`, `list` and `delete` subcommand with `codegangsta/cli` package.
+_DEMO_ - generating a `todo` CLI application which has `add`, `list` and `delete` subcommand with `codegangsta/cli` package.
 
 .image img/gcli.gif 400 _
 
