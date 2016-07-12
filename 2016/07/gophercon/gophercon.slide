@@ -1,4 +1,4 @@
-My golang packages/tools for writing CLI tool
+My golang tools for writing CLI tool
 GopherCon 2016 LT
 11 Jul 2016
 
@@ -33,27 +33,18 @@ Taichi Nakashima
 * TL;DR
 
 # I love to write CLI tool in golang and I've written a lot of CLI tools.
-# While doing this, I also wrote many helper tools and pacakges to build CLI tool.
+# While doing this, I also wrote helper tools to build CLI tool.
 # So in this talk I want to introduce some of them.
 # with live demo. I hope it will work well...
 
-Introduce my golang packages/tools for writing CLI tool in golang.
+Introduce my golang tools for writing CLI tool in golang.
 
+* My golang tools
 
-* My golang packages/tools
-
-# Here is tools and a package I want to share.
-
-Tools
+# Here is tools I want to share.
 
 - [[https://github.com/tcnksm/gcli][gcli]] 
 - [[https://github.com/tcnksm/ghr][ghr]]
-
-Packages
-
-- [[https://github.com/tcnksm/go-latest][go-latest]] 
-
-* Tools
 
 * gcli
 
@@ -158,43 +149,6 @@ e.g., `wercker.yml`
     - tcnksm/ghr:
       token: $GITHUB_TOKEN          
       input: dist
-
-* Pacakges
-
-* go-latest
-
-Check the given version is latest or not from various sources (tag on GitHub, HTML tag).
-
-* go-latest
-
-_SAMPLE_
-
-e.g., Check [[https://github.com/tcnksm/ghr][ghr]] version by tag on GitHub
-
-    githubTag := &latest.GithubTag{
-        Owner: "tcnksm",
-        Repository: "ghr",
-    }
-
-    res, _ := latest.Check(githubTag, "0.1.0")
-    res.Outdated // true 🙅 Not latest
-    
-    res, _ := latest.Check(githubTag, "0.4.0")
-    res.Outdated // false 🙆 Latest
-
-* go-latest
-
-*How* *to* *use?*
-
-To encourage user to upgrade to latest version of your tool
-
-e.g.,
-
-  ./cool-cli -version
-  cool-cli 0.1.0
-  
-  Your cool-cli version is not latest (0.5.0)
-  Do you want to update ? [Y/n]: 
 
 * Conclution
 
