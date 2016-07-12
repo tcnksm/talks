@@ -1,0 +1,203 @@
+My golang packages/tools for writing CLI tool
+GopherCon 2016 LT
+11 Jul 2016
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- Taichi Nakashima
+- Tokyo, Japan
+- *@deeeet* (Twitter) / *@tcnksm* (GitHub)
+
+# Let me introduce myself first.
+# My name is taichi nakashima. I'm from Tokyo Japan
+# This is my twitter & github account
+
+* Rakuten Inc.
+
+.image img/rakuten.jpg 200 _
+
+- Software developer at Rakuten Inc.
+- Internal PaaS (based on Cloud Foundry) team
+- Open source projects - [[https://github.com/rakutentech/go-nozzle][go-nozzle]], [[https://github.com/rakutentech/kafka-firehose-nozzle][kafka-firehose-nozzle]]
+
+# I'm software developer at Rakuten Inc. Rakuten is one of the e-comerce company in Japan.
+# In Rakuten, we have internal Platform as a Service based on Cloud Foundry for rakuten engineers.
+#
+# I'm doing some dev&ops for that platform.
+
+* TL;DR
+
+# I love to write CLI tool in golang and I've written a lot of CLI tools.
+# While doing this, I also wrote many helper tools and pacakges to build CLI tool.
+# So in this talk I want to introduce some of them.
+# with live demo. I hope it will work well...
+
+Introduce my golang packages/tools for writing CLI tool in golang.
+
+
+* My golang packages/tools
+
+# Here is tools and a package I want to share.
+
+Tools
+
+- [[https://github.com/tcnksm/gcli][gcli]] 
+- [[https://github.com/tcnksm/ghr][ghr]]
+
+Packages
+
+- [[https://github.com/tcnksm/go-latest][go-latest]] 
+
+* Tools
+
+* gcli
+
+# First one is gcli
+# This name comes from 
+
+G(enerate)CLI
+
+Generate a skeleton (codes and its directory structure) project you need to start building CLI tool right out of the box.
+
+It generates a project based on famous CLI framework like [[https://github.com/urfave/cli][codegangsta/cli]] (now `urfave/cli`), [[https://github.com/mitchellh/cli][mitchellh/cli]] and so on.
+
+*Why?*
+
+# When you write CLI tool in Golang, you may notice you're writing the chunk of boilerplate codes.
+# For example, subcommand definition is always same. I want to skip writing common part
+# and focus on function part.
+#
+# That's why I wrote this tool.
+
+To focus on function part instead of writing the chunk of boilerplate codes (especially subcommand definition part)
+
+* gcli
+
+# Let me show a simple demo
+
+_DEMO_ - generating `todo` CLI application which has `add`, `list` and `delete` sub-command with `codegangsta/cli` package.
+
+.image img/gcli.gif 400 _
+
+# As you can see it generates codes and directory structure you need.
+# It also generates README.md and .gitignore file
+# 
+# It go build able from beginning
+# Let me do that.
+# 
+# Now there is a binary and you can run it
+# You can see the help message which has add and list, delete command.
+
+# cd $GOPATH/src/github.com/tcnksm/
+# gcli new -c add -c list -c delete todo
+# cd todo
+# go build
+# ./todo -h
+
+* gcli
+
+You can also generate a project from `.toml` file (e.g., Generate `todo` CLI application)
+
+  # sample.toml
+  Name = "todo" 
+  Owner = "tcnksm" 
+  Version = "0.1.0" 
+  Description = "Manage TODO tasks from command line"
+
+  [[Commands]]
+    Name = "add" 
+    Synopsis = "Add new task" 
+    Help = "[Usage] todo [option] add TASK" 
+
+  ...
+
+And run the following command,
+
+  $ gcli apply sample.toml
+
+* ghr
+
+G(it)H(ub)R(elease)
+
+Upload multiple artifacts to GitHub Release page in parallel with *one* command
+
+*Why?*
+
+# When you distribute your CLI tool to user, you will cross-compile it for multiple platform like linux, windows or darwin and upload them to GitHub Release page, bintray.com, S3 and so on.
+# I prefer to use Github Release page, so I made ghr to simplify cross-compile binaries release there.
+
+To make cross-compiled binaries release simple & easy
+
+* ghr
+
+_DEMO_ - uploading cross-compiled binaries
+
+.image img/ghr.gif 400 _
+
+# cat main.go
+# gox -os="darwin linux windows" -output "out/{{.Dir}}_{{.OS}}_{{.Arch}}"
+# ls out/
+# ghr v1.0.0 out/
+
+* ghr
+
+You can also use it on CI service like Travis or Wercker.
+
+# After test is passed, cross-copmpile and release binearies to GitHub.
+# The following is the example of werker.yml
+
+e.g., `wercker.yml`
+
+  deploy:
+    steps:
+    - tcnksm/ghr:
+      token: $GITHUB_TOKEN          
+      input: dist
+
+* Pacakges
+
+* go-latest
+
+Check the given version is latest or not from various sources (tag on GitHub, HTML tag).
+
+* go-latest
+
+_SAMPLE_
+
+e.g., Check [[https://github.com/tcnksm/ghr][ghr]] version by tag on GitHub
+
+    githubTag := &latest.GithubTag{
+        Owner: "tcnksm",
+        Repository: "ghr",
+    }
+
+    res, _ := latest.Check(githubTag, "0.1.0")
+    res.Outdated // true 🙅 Not latest
+    
+    res, _ := latest.Check(githubTag, "0.4.0")
+    res.Outdated // false 🙆 Latest
+
+* go-latest
+
+*How* *to* *use?*
+
+To encourage user to upgrade to latest version of your tool
+
+e.g.,
+
+  ./cool-cli -version
+  cool-cli 0.1.0
+  
+  Your cool-cli version is not latest (0.5.0)
+  Do you want to update ? [Y/n]: 
+
+* Conclution
+
+I also wrote more. If you are interested, please visit [[https://github.com/tcnksm][github.com/tcnksm]] 
+
+I hope these packages/tools will help you writing CLI tool in Golang.
