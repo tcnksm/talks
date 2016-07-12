@@ -22,7 +22,7 @@ Introduce my golang CLI applications that help developing golang CLI application
 
 * My golang CLI applications
 
-# I will share this 2 tools
+# I will share these tools
 
 - [[https://github.com/tcnksm/gcli][gcli]] 
 - [[https://github.com/tcnksm/ghr][ghr]]
@@ -41,10 +41,10 @@ You can choose famous CLI framework like [[https://github.com/urfave/cli][codega
 *Why?*
 
 # When you write CLI application in Golang,
-# you may notice everytime you're writing the chunk of boilerplate codes.
-# For example, subcommand definition is always same.
+# you may notice everytime you're writing a lot of boilerplate codes.
+# For example, subcommand interface definition is always same, right ?
 #
-# I want to avoid writing common part everytime
+# I want to avoid writing common code everytime, 
 # and focus on function part.
 #
 # That's why I wrote this tool.
@@ -54,19 +54,22 @@ To focus on function part of application instead of writing the chunk of boilerp
 * gcli
 
 # Let me show a simple demo
+# In this demo, I will generate
 
 _DEMO_ - generating `todo` CLI application which has `add`, `list` and `delete` subcommand with `codegangsta/cli` package.
 
 .image img/gcli.gif 400 _
 
-# As you can see it generates codes and directory structure you need.
-# It also generates README.md and .gitignore file
+# As you can see it generates go codes with test and directory structure,
+# It also generates README.md and .gitignore file and so on.
 # 
 # It's go build able from beginning
 # Let me do that.
 # 
 # Now there is a binary and you can run it
-# Let's show the help messages and it shows it has add and list, delete command
+# Let's show the help messages.
+# 
+# It shows it has add and list, delete command
 # 
 # Now you can start to write actual TODO application function part
 
@@ -99,6 +102,8 @@ And run the following command,
 
 * gcli
 
+# You can do more things, please vist to my github account
+
 See more on [[https://github.com/tcnksm/gcli][https://github.com/tcnksm/gcli]]
 
 * ghr
@@ -109,10 +114,10 @@ Upload multiple artifacts to GitHub Release page in parallel with *one* command
 
 *Why?*
 
-# When you distribute your CLI application to user, How do you do that ?
-# you will cross-compile it for multiple platform like linux, windows or darwin
-# and upload them to GitHub Release page, bintray.com, S3 and so on.
-# Because it's one of the biggest advantages of golang, right?
+# When you release your CLI application to user, How do you do that ?
+# I think you will cross-compile it for multiple platform like linux, windows or darwin
+# and upload them to GitHub Release page, bintray.com, S3 or something like that. 
+# Because it's one of the biggest because of golang, right?
 # 
 # Personally, I prefer to use Github Release page,
 # so I made ghr to simplify cross-compile binaries release procedure.
@@ -121,9 +126,17 @@ To simplify cross-compiled binaries release procedure
 
 * ghr
 
+# Let me show another demo for this, I will
+
 _DEMO_ - uploading cross-compiled binaries
 
 .image img/ghr.gif 400 _
+
+# I have a very simple application, it just display "Hello,GHR"
+# and I already cross-compile it for darwin and linux and windows.
+#
+# You can upload them by
+# ghr with its release version, directory where binearies are
 
 # cat main.go
 # gox -os="darwin linux windows" -output "out/{{.Dir}}_{{.OS}}_{{.Arch}}"
