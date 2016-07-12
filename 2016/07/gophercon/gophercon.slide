@@ -10,7 +10,7 @@ Taichi Nakashima
 .image img/deeeet.png 200 _
 
 - Taichi Nakashima
-- Tokyo, Japan
+- Tokyo, Japan 🇯🇵
 - *@deeeet* (Twitter) / *@tcnksm* (GitHub)
 
 # My name is Taichi Nakashima. I'm from Tokyo Japan
@@ -36,7 +36,7 @@ G(enerate)CLI
 
 Generate a skeleton (codes and its directory structure) project you need to start building CLI application right out of the box.
 
-You can choose famous CLI framework like [[https://github.com/urfave/cli][codegangsta/cli]] (now `urfave/cli`), [[https://github.com/mitchellh/cli][mitchellh/cli]] and so on.
+You can choose famous CLI framework like [[https://github.com/urfave/cli][codegangsta/cli]] (now `urfave/cli`), [[https://github.com/mitchellh/cli][mitchellh/cli]] and so on. You can also generate without framework, same struct and methond go command has.
 
 *Why?*
 
@@ -99,7 +99,7 @@ And run the following command,
 
 * gcli
 
-See more info on [[https://github.com/tcnksm/gcli][https://github.com/tcnksm/gcli]]
+See more on [[https://github.com/tcnksm/gcli][https://github.com/tcnksm/gcli]]
 
 * ghr
 
@@ -150,7 +150,7 @@ e.g., on werker you can run `go test`. If it's passed, you can cross-copmpile an
 
 * ghr
 
-See more info on [[https://github.com/tcnksm/ghr][https://github.com/tcnksm/ghr]]
+See more on [[https://github.com/tcnksm/ghr][https://github.com/tcnksm/ghr]]
 
 * Conclution
 
