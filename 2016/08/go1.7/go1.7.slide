@@ -1,0 +1,260 @@
+Go 1.7 Release Party at Tokyo
+GoCon Tokyo
+8 Aug 2016
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[http://deeeet.com][http://deeeet.com]]
+- A PaaS Dev&Ops (Using CloudFoundry)
+
+* OSS
+
+Tools
+
+- [[https://github.com/tcnksm/gcli][gcli]] - The easy way to build Golang command-line application
+- [[https://github.com/tcnksm/gotests][gotests]] - A tool to generate Go test functions from the given source code like gofmt
+- [[https://github.com/tcnksm/ghr][ghr]] - Create Github Release and upload artifacts in parallel
+- [[https://github.com/tcnksm/license][license]] - Generate LICENSE file you want
+- [[https://github.com/rakutentech/kafka-firehose-nozzle][kafka-firehose-nozzle]] - Integrate CloudFoundry with [[http://kafka.apache.org/][Apache Kafka]]
+
+Packages
+
+- [[https://github.com/tcnksm/go-input][go-input]] - Go package for ideal tty prompt
+- [[https://github.com/tcnksm/go-latest][go-latest]] - Simple way to check version is latest or not from various sources in Go
+- [[https://github.com/rakutentech/go-nozzle][go-nozzle]] - Go package for building CloudFoundry nozzle 
+
+* Welcome
+
+パーティー失敗 (6ヶ月ぶり2回目) ?
+
+* Welcome
+
+Let's celebrate the release of Go1.7.
+
+This event is fork of [[https://github.com/golang/go/wiki/Go-1.6-release-party][Go1.6 release party]] by @davecheney. It's not the world wide event like before ... 😭
+
+(But in Japan, it seems another release party will be held [[https://twitter.com/qt_luigi/status/761555858635395072][at Okayama in Aug 11]])
+
+This presentation is based _heavily_ on the [[http://tip.golang.org/doc/go1.7][official Go 1.7 release notes]].
+
+* Go 1.7
+
+The latest Go release, version 1.7, arrives six months after 1.6 (17 February).
+
+Most of its changes are in the implementation of the toolchain, runtime, and libraries. There are no changes to the language specification.
+
+As always, the release maintains the [[http://tip.golang.org/doc/go1compat.html][Go 1 compatibility guarantee]].
+
+Almost all Go programs are expected to continue to compile and run as before.
+
+* New ports
+
+macOS 10.12 Sierra (This support was backported to Go 1.6.3. Binaries built with versions of Go before 1.6.3 will not work correctly on Sierra)
+
+Experimental port to Linux on z Systems (linux/s390x)
+
+The beginning of a port to Plan 9 on ARM (plan9/arm)
+
+* Tools
+
+* Tools
+
+- Compiler Toolchain
+- Go command
+- Go vet
+
+* Compiler Toolchain (SSA)
+
+This release includes a new code generation back end for 64-bit x86 systems.
+
+The new back end, based on SSA, generates more compact, more efficient code and provides a better platform for optimizations such as bounds check elimination. The new back end reduces the CPU time required by official benchmark programs by *5-35%*.
+
+For this release, the new back end can be disabled by passing `-ssa=0` to the compiler.
+
+* Compiler Toolchain (New export)
+
+The format of exported metadata written by the compiler in package archives has changed: the old textual format has been replaced by a more compact *binary* *format*.
+
+This results in somewhat *smaller* *package* *archives* and fixes a few long-standing corner case bugs.
+
+For this release, the new export format can be disabled by passing `-newexport=0` to the compiler.
+
+* Compiler Toolchain (Compilation time improvements)
+
+Because of translation from C to Go in Go1.5, compile times are slower than they used to be... around 3x slower than 1.4.3.
+
+.image http://dave.cheney.net/wp-content/uploads/2016/04/Screen-Shot-2016-04-02-at-17.18.47.png  _ 1000
+.caption [[http://dave.cheney.net/2016/04/02/go-1-7-toolchain-improvements][Go 1.7 toolchain improvements]]
+
+Now the slowdown is 2.2x than 1.4.3 🎉
+
+* Compiler Toolchain (Linker)
+
+The compiler and linker have been optimized and run *significantly* *faster* in this release than in Go 1.6, although they are still slower than we would like and will continue to be optimized in future releases.
+
+* Compiler Toolchain (Linker)
+
+.image http://dave.cheney.net/wp-content/uploads/2016/04/Screen-Shot-2016-04-02-at-20.07.42.png _ 1000
+.caption [[http://dave.cheney.net/2016/04/02/go-1-7-toolchain-improvements][Go 1.7 toolchain improvements]]
+
+> 10% faster for any non trivial binary, and up to 30% faster for large binaries like jujud.
+
+* Compiler Toolchain (Stack frame)
+
+On x86-64 systems, Go programs now maintain stack frame pointers as expected by profiling tools like Linux's perf and Intel's VTune, making it easier to analyze and optimize Go programs using these tools.
+
+The frame pointer maintenance has a small run-time overhead that varies but averages around 2%. We hope to reduce this cost in future releases.
+
+To build a toolchain that does not use frame pointers, set GOEXPERIMENT=noframepointer when running make.bash, make.bat, or make.rc.
+
+* Compiler Toolchain (-X option)
+
+The linker's `-X` option no longer supports the unusual two-argument form -X name value, as announced in the Go 1.6 release and in warnings printed by the linker,
+
+   $ go build -ldflags="-X main.Commit $GIT_COMMIT"
+
+Use -X name=value instead,
+
+   $ go build -ldflags="-X main.Commit=$GIT_COMMIT"
+
+* Go command
+
+The go command's basic operation is unchanged, but there are a number of changes worth noting.
+
+- Removes support for the `GO15VENDOREXPERIMENT` environment variable
+- "go list" now includes a StaleReason field explaining why a particular package is or is not considered stale 
+- Supports import paths referring to [[git.openstack.org][git.openstack.org]]
+
+* Go command (Binary-only package)
+
+This release adds experimental, minimal support for building programs using binary-only packages, packages distributed in binary form without the corresponding source code.
+
+The minimal source code for a binary-only package,
+
+    //go:binary-only-package
+
+    package hello
+
+Full example is on [[https://github.com/tcnksm/go-binary-only-package][tcnksm/go-binary-only-package]]
+
+* Go Vet (-tests)
+
+Adds a new `-tests` check that checks the name and signature of likely test functions.
+
+    func TestbadSuffix(*testing.T) {} // ERROR "first letter after 'Test' must not be lowercase"
+
+* Go Vet (-lostcancel)
+
+Add a new `-lostcancel` that checks which detects failure to call the cancelation function returned by the `WithCancel`, `WithTimeout`, and `WithDeadline` functions in Go 1.7's new context package.
+
+    func _() {
+        ctx, cancel := context.WithCancel()
+        defer cancel() // ok
+    }
+
+    func _() {
+        ctx, cancel := context.WithCancel() // ERROR "the cancel function is not used on all paths \(possible context leak\)"
+    } // ERROR "this return statement may be reached without using the cancel var defined on line 17"         
+
+* Performance
+
+* Performance
+
+As always, the changes are so general and varied that precise statements about performance are difficult to make.
+
+Most programs should run a bit faster, due to speedups in the garbage collector and optimizations in the core library.
+
+On x86-64 systems, many programs will run significantly faster, due to improvements in generated code brought by the new compiler back end. The code generation changes alone typically reduce program CPU time by *5-35%*.
+
+There have been significant optimizations bringing more than *10%* improvements to implementations in the crypto/sha1, crypto/sha256, encoding/binary, fmt, hash/adler32, hash/crc32, hash/crc64, image/color, math/big, strconv, strings, unicode, and unicode/utf16 packages.
+
+* Performance (GC)
+
+Garbage collection pauses should be significantly shorter than they were in Go 1.6 for programs with large numbers of idle goroutines, substantial stack size fluctuation, or large package-level variables.
+
+- [[https://blog.twitch.tv/gos-march-to-low-latency-gc-a6fa96f06eb7#.4zczmgdlo][Go's march to low-latency GC]]
+- [[http://deeeet.com/writing/2016/05/08/gogc-2016/][GolangのGCを追う]]
+- [[http://deeeet.com/writing/2016/06/29/toc/][Golangの新しいGCアルゴリズム Transaction Oriented Collector（TOC）]]
+
+* Standard library
+
+* Standard library
+
+- Context
+- Testing
+- HTTP Tracing
+
+* Context
+
+Go 1.7 moves the [[golang.org/x/net/context][golang.org/x/net/context]] package into the standard library as `context`. This allows the use of contexts for cancelation, timeouts, and passing request-scoped data in other standard library packages, including net, net/http, and os/exec
+
+New interface (contract) for passing cancellation signal and scoped values (like request token). 
+
+- [[https://blog.golang.org/context][Go Concurrency Patterns: Context]]
+- [[https://peter.bourgon.org/blog/2016/07/11/context.html][Context]] by Peter Bourgon (about `context.Value`)
+- [[http://deeeet.com/writing/2016/07/22/context/][Go1.7のcontextパッケージ]]
+
+* Context (net/http)
+
+As a http client, you can pass `Context` by `Request.WithContext()` method.
+
+.code src/context_http.go /START OMIT/,/END OMIT/
+
+As a http handler, you can get the given `Context` by `Request.Context()` method.
+
+.code src/context_http_server.go /START OMIT/,/END OMIT/
+
+* Context (os/exec)
+
+You can create context-powered `exec.Cmd`
+
+.code src/context_command.go /START OMIT/,/END OMIT/
+
+The provided context is used to kill the process (by calling `os.Process.Kill`) if the context becomes done before the command completes on its own.
+
+* Testing
+
+The testing package now supports the definition of tests with subtests and benchmarks with sub-benchmarks. This support makes it easy to write table-driven benchmarks and to create hierarchical tests. It also provides a way to share common setup and tear-down code.
+
+- [[http://deeeet.com/writing/2016/08/02/go1_7-subtest/][Go1.7のSubtestsとSub-benchmarks]]
+
+* Testing (before)
+
+When you want to take benchmark of method `Foo` with different configuration,
+
+.code src/subbench_before.go /START OMIT/,/END OMIT/
+
+You need to define functions for each configuration
+
+* Testing (after)
+
+When you want to take benchmark of method `Foo` with different configuration,
+
+.code src/subbench_after.go /START OMIT/,/END OMIT/
+
+You can use [[https://github.com/golang/go/wiki/TableDrivenTests][table-driven]] approach for benchmark.
+
+* HTTP Tracing
+
+Go 1.7 introduces `net/http/httptrace`, a package that provides mechanisms for tracing events within HTTP requests.
+
+You can set the following hooks to run at various stages of an HTTP client request.
+
+.code src/httptrace.go /START OMIT/,/END OMIT/
+
+* HTTP Tracing
+
+You can pass `httptrace` hooks via `Context`
+
+.play src/httptrace_req.go /START OMIT/,/END OMIT/
+
+
+* Standard library
+
+And a lot of minor changes 👍
