@@ -39,7 +39,7 @@ Let's celebrate the release of Go1.7.
 
 This event is fork of [[https://github.com/golang/go/wiki/Go-1.6-release-party][Go1.6 release party]] by @davecheney. It's not the world wide event like before ... 😭
 
-(But in Japan, it seems another release party will be held [[https://twitter.com/qt_luigi/status/761555858635395072][at Okayama in Aug 11]])
+(But it seems release party will be held [[http://connpass.com/event/37499/?utm_campaign=event_publish_to_follower&utm_medium=twitter&utm_source=notifications][in Okayama, Japan]] and [[https://twitter.com/jesserlucas/status/762327252994396160][in Louisville, Kentucky]])
 
 This presentation is based _heavily_ on the [[http://tip.golang.org/doc/go1.7][official Go 1.7 release notes]].
 
@@ -112,6 +112,16 @@ On x86-64 systems, Go programs now maintain stack frame pointers as expected by 
 The frame pointer maintenance has a small run-time overhead that varies but averages around 2%. We hope to reduce this cost in future releases.
 
 To build a toolchain that does not use frame pointers, set GOEXPERIMENT=noframepointer when running make.bash, make.bat, or make.rc.
+
+* Compiler Toolchain (Stack frame)
+
+.image http://deeeet.com/images/torch.svg _ 800
+
+See more
+
+- [[http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html][FlameGraphs]] by Brendan Gregg
+- [[https://github.com/uber/go-torch][Stochastic flame graph profiler for go pprof]] 
+- [[http://deeeet.com/writing/2016/05/29/go-flame-graph/][GolangでFlame Graphを描く]]
 
 * Compiler Toolchain (-X option)
 
