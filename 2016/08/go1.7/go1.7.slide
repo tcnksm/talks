@@ -1,4 +1,4 @@
-Go 1.7 Release Party at Tokyo
+Go 1.7 Release Party in Tokyo
 GoCon Tokyo
 8 Aug 2016
 
@@ -27,11 +27,7 @@ Packages
 
 - [[https://github.com/tcnksm/go-input][go-input]] - Go package for ideal tty prompt
 - [[https://github.com/tcnksm/go-latest][go-latest]] - Simple way to check version is latest or not from various sources in Go
-- [[https://github.com/rakutentech/go-nozzle][go-nozzle]] - Go package for building CloudFoundry nozzle 
-
-* Welcome
-
-パーティー失敗 (6ヶ月ぶり2回目) ?
+- [[https://github.com/rakutentech/go-nozzle][go-nozzle]] - Go package for building CloudFoundry nozzle
 
 * Welcome
 
@@ -85,6 +81,10 @@ This results in somewhat *smaller* *package* *archives* and fixes a few long-sta
 
 For this release, the new export format can be disabled by passing `-newexport=0` to the compiler.
 
+* Compiler Toolchain (Linker)
+
+The compiler and linker have been optimized and run *significantly* *faster* in this release than in Go 1.6, although they are still slower than we would like and will continue to be optimized in future releases.
+
 * Compiler Toolchain (Compilation time improvements)
 
 Because of translation from C to Go in Go1.5, compile times are slower than they used to be... around 3x slower than 1.4.3.
@@ -94,11 +94,7 @@ Because of translation from C to Go in Go1.5, compile times are slower than they
 
 Now the slowdown is 2.2x than 1.4.3 🎉
 
-* Compiler Toolchain (Linker)
-
-The compiler and linker have been optimized and run *significantly* *faster* in this release than in Go 1.6, although they are still slower than we would like and will continue to be optimized in future releases.
-
-* Compiler Toolchain (Linker)
+* Compiler Toolchain (Linker time improvements)
 
 .image http://dave.cheney.net/wp-content/uploads/2016/04/Screen-Shot-2016-04-02-at-20.07.42.png _ 1000
 .caption [[http://dave.cheney.net/2016/04/02/go-1-7-toolchain-improvements][Go 1.7 toolchain improvements]]
@@ -121,7 +117,6 @@ See more
 
 - [[http://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html][FlameGraphs]] by Brendan Gregg
 - [[https://github.com/uber/go-torch][Stochastic flame graph profiler for go pprof]] 
-- [[http://deeeet.com/writing/2016/05/29/go-flame-graph/][GolangでFlame Graphを描く]]
 
 * Compiler Toolchain (-X option)
 
@@ -189,8 +184,6 @@ There have been significant optimizations bringing more than *10%* improvements 
 Garbage collection pauses should be significantly shorter than they were in Go 1.6 for programs with large numbers of idle goroutines, substantial stack size fluctuation, or large package-level variables.
 
 - [[https://blog.twitch.tv/gos-march-to-low-latency-gc-a6fa96f06eb7#.4zczmgdlo][Go's march to low-latency GC]]
-- [[http://deeeet.com/writing/2016/05/08/gogc-2016/][GolangのGCを追う]]
-- [[http://deeeet.com/writing/2016/06/29/toc/][Golangの新しいGCアルゴリズム Transaction Oriented Collector（TOC）]]
 
 * Standard library
 
