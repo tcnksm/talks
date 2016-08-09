@@ -117,7 +117,8 @@ To build a toolchain that does not use frame pointers, set GOEXPERIMENT=noframep
 
 * Compiler Toolchain (Stack frame)
 
-.image http://deeeet.com/images/torch.svg _ 800
+.image img/torch.png  _ 800
+.caption [[http://deeeet.com/images/torch.svg][http://deeeet.com/images/torch.svg]]
 
 See more
 
