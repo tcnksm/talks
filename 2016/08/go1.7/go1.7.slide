@@ -33,6 +33,12 @@ Packages
 
 Let's celebrate the release of Go1.7.
 
+* Welcome
+
+Not yet released (8 Aug) ...
+
+* Welcome
+
 This event is fork of [[https://github.com/golang/go/wiki/Go-1.6-release-party][Go1.6 release party]] by @davecheney. It's not the world wide event like before ... 😭
 
 (But it seems release party will be held [[http://connpass.com/event/37499/?utm_campaign=event_publish_to_follower&utm_medium=twitter&utm_source=notifications][in Okayama, Japan]] and [[https://twitter.com/jesserlucas/status/762327252994396160][in Louisville, Kentucky]])
@@ -201,7 +207,6 @@ New interface (contract) for passing cancellation signal and scoped values (like
 
 - [[https://blog.golang.org/context][Go Concurrency Patterns: Context]]
 - [[https://peter.bourgon.org/blog/2016/07/11/context.html][Context]] by Peter Bourgon (about `context.Value`)
-- [[http://deeeet.com/writing/2016/07/22/context/][Go1.7のcontextパッケージ]]
 
 * Context (net/http)
 
