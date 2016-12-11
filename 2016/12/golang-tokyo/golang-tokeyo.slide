@@ -1,0 +1,98 @@
+テストしやすいGolangコードを書く
+golang.tokyo #2
+12 Dec 2016
+
+Taichi Nakashima
+@deeeet
+
+* 言いたいこと
+
+依存を明確にせよ！
+
+* whoami
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[deeeet.com][http://deeeet.com]]
+- A PaaS Dev&Ops
+
+* OSS
+
+Tools
+
+- [[https://github.com/tcnksm/gcli][gcli]] - The easy way to build Golang command-line application
+- [[https://github.com/tcnksm/ghr][ghr]] - Create Github Release and upload artifacts in parallel
+
+Packages
+
+- [[https://github.com/tcnksm/go-httpstat][go-httpstat]] - Go package for tracing golang HTTP request latency
+- [[https://github.com/tcnksm/go-input][go-input]] - Go package for ideal tty prompt
+- [[https://github.com/tcnksm/go-latest][go-latest]] - Simple way to check version is latest or not from various sources in Go
+
+* Publications
+
+.image img/minnanoGo.jpg 500 _
+
+.caption [[https://www.amazon.co.jp/dp/477418392X][みんなのGo言語]]
+
+* Testable Golang Design
+
+* テストとは何か?
+
+* テストとは何か?
+
+入力に対して期待する出力が得られているかを確認すること
+
+* テストできない?
+
+1. コードが複雑で新しい機能を追加するのが難しい
+2. リファクタリングして見通しの良いコードにしよう
+3. リファクタリングのためにはテストが必要だ
+4. テストを書くのが難しい...
+5. リファクタリングできない...
+6. 飲みに行こう🍻
+
+* なぜテストが難しくなってしまうのか?
+
+- 関数に対する「入力」がコントロールしきれていない
+- 関数の「出力」や「外界への影響（副作用）」を取り出せない
+- 関数の依存を抽象化できていない
+
+* テストできないコードはない
+
+- 問題はテストできない設計やデザインである
+- 良いテストを書くことは良いコードを書くことと同じである
+
+* Unitテストが大切
+
+.image img/pyramid.png 300 _
+
+.caption [[https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html][Just Say No to More End-to-End Tests]]
+
+- Unitテストは速い
+- Unitテストは信頼できる
+- Unitテストは問題を分離できる
+
+* Unitテストが大切
+
+- シンプルなUnitテストをしっかり書く/積み上げることが大切である
+- 「基本的で，明らかに正しい関数を組み合わせて，より大きな関数を組み立てる」（「すごいHaskell楽しく学ぼう」）
+
+* 今日の話
+
+何に気をつければTestableなGolangのコードを書けるか（Golangで良いUnitテストを書くにはどうするか）
+
+* 絶対に観てほしい！
+
+- [[https://speakerdeck.com/mitchellh/advanced-testing-with-go][Advanced Testing with Go]] by @mitchellh
+- [[https://peter.bourgon.org/go-best-practices-2016/][Go best practices, six years in]] by @peterbourgon
+
+* 前提
+
+`testing`パッケージで十分である．フレームワークは使わない．
+
+テストのためのフレームワークを使うことは新たなMini language（DSL）を導入することと変わらない．最初にそれを書く人は楽になるかもしれないが新しくプロジェクトに参入してきたひとにはコストにしかならない（Golang以外も学ぶ必要がある）
+
+[[https://golang.org/doc/faq#Packages_Testing][Where is my favorite helper function for testing?]]
+
