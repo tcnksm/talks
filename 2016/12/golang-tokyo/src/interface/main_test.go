@@ -2,6 +2,7 @@ package main
 
 import "testing"
 
+// START OMIT
 type TestDB struct {
 	data string
 }
@@ -16,8 +17,9 @@ func (d *TestDB) Get(key string) (string, error) {
 	return d.data, nil
 }
 
-func TestProcess(t *testing.T) {
+// END OMIT
 
+func TestProcess(t *testing.T) {
 	want := "golang-tokyo"
 	testDB := NewTestDB(want)
 	got, err := process(testDB)

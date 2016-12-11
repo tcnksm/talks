@@ -1,4 +1,4 @@
-テストしやすいGolangコードを書く
+Testable Golang Design
 golang.tokyo #2
 12 Dec 2016
 
@@ -82,6 +82,13 @@ Packages
 * 今日の話
 
 何に気をつければTestableなGolangのコードを書けるか（Golangで良いUnitテストを書くにはどうするか）
+
+（自分がやってきたこと/意識してきたことを言語化してきました）
+
+* 今日の話
+
+.image img/tweet.png 400 _
+
 
 * 絶対に観てほしい！
 
@@ -429,12 +436,99 @@ Table Driven Testに落とし込める！
 
 * 外界への依存を抽象化できていない
 
-ある関数は外部のサービスやDBに依存する．
+ある関数は外部のサービスやDBに依存する．それらを常に準備できない場合（e.g., CIサーバー）や準備にコストがかかる場合はテストしにくくなる．
 
-Interfaceを使い依存をモック化する．
+interfaceを使い依存をモック化する．interfaceを使えば「実際の実装」を気にしないで「振る舞い」を渡すことができる．
 
-* Interfaceによるモック
+* interfaceによるモック
 
 良くない例
 
 .code src/interface/bad/main.go /START OMIT/,/END OMIT/
+
+`process`関数はRedisに依存する．Redisなしでテストを行うにはどうすればよいか?
+
+* interfaceによるモック
+
+良い例（`DB`というinterfaceを定義する）
+
+.code src/interface/main.go /^type DB/,/^}/
+
+* interfaceによるモック
+
+良い例（interfaceを引数としてprocessに渡す）
+
+.code src/interface/main.go /START OMIT/,/END OMIT/
+
+* interfaceによるモック
+
+良い例（`DB` interfaceを満たすTestDBを定義する）
+
+.code src/interface/main_test.go /START OMIT/,/END OMIT/
+
+* interfaceによるモック
+
+良い例（テストのときはTestDBをprocessに渡す）
+
+.code src/interface/main_test.go /^func Test/,/^}/
+
+* interfaceによるモック
+
+より良い例（環境変数で実際のDBによるテストとモックによるテストを切り替える）
+
+.code src/interface/better/main_test.go /^func test/,/^}/
+
+コード外で（例えばDockerなどで）Redisが準備できる場合は接続先の情報を環境変数で渡す．
+
+実際のDBでテストを行うことも大切である．
+
+* interface化する利点
+
+interface化にはモック以外の利点もある．例えばRedis以外のDBに切り替えたいときは`DB` interfaceを満たす関数を別途準備するだけで良い．
+
+* デザインの指標（外界の抽象化）
+
+- interfaceを使いモック化を行う
+
+* まとめ
+
+- グローバル変数を避ける（使ってもデフォルト値のみで使う）
+- なるべく設定可能にして「明示的に」入力として渡せるようにする
+- コード外からの入力はmain関数でローカル変数に取り込む（入り口を制限する）
+- `os.Stdin`は`io.Reader`で抽象化する
+- void的な関数を避ける
+- io.Writerを使う！
+- main関数で`os.Stdout`/`os.Stdin`を「入力として」渡す
+- `os.Exit`はmainでのみ呼ぶ（「出口」を制限する）
+- `os.Args`を引数として渡す
+- interfaceを使いモック化を行う
+
+* まとめ
+
+依存を明確にせよ！
+
+
+* 参考文献1
+
+- [[http://deeeet.com/writing/2016/10/25/go-interface-testing/][Golangにおけるinterfaceをつかったテスト技法]]
+- [[http://deeeet.com/writing/2014/12/18/golang-cli-test/][Go言語でテストしやすいコマンドラインツールをつくる]]
+- [[https://speakerdeck.com/mitchellh/advanced-testing-with-go][Advanced Testing with Go]] 
+- [[https://peter.bourgon.org/go-best-practices-2016/][Go best practices, six years in]]
+- [[https://talks.golang.org/2014/testing.slide#1][Testing Techniques]]
+- [[https://blog.gopheracademy.com/advent-2015/symmetric-api-testing-in-go/][Symmetric API Testing]] 
+- [[https://github.com/peterbourgon/go-microservices][Go + microservices]]
+- [[https://medium.com/@benbjohnson/structuring-tests-in-go-46ddee7a25c#.t6pxjnsy0][Structuring Tests in Go]] 
+- [[https://nathanleclaire.com/blog/2015/10/10/interfaces-and-composition-for-effective-unit-testing-in-golang/][Interfaces and Composition for Effective Unit Testing in Golang]]
+- [[https://interpreterbook.com/][Writing An Interpreter In Go]]
+- [[https://robots.thoughtbot.com/where-to-define-command-line-flags-in-go][Where to Define Command-Line Flags in Go]]
+
+
+* 参考文献2
+
+- [[https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html][The Clean Architecture]]
+- [[https://appliedgo.net/di/][The Clean Architecture incl. the Dependency Rule]]
+- [[http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/][Applying The Clean Architecture to Go applications]]
+- [[http://fideloper.com/hexagonal-architecture][http://fideloper.com/hexagonal-architecture]]
+- [[https://dave.cheney.net/2016/08/20/solid-go-design][SOLID Go Design]] [[https://www.youtube.com/watch?v=zzAdEt3xZ1M][video]]
+- [[https://changelog.com/gotime/16][Go Time #16: SOLID Go Design with Dave Cheney | Changelog]]
+- [[https://www.youtube.com/watch?v=dKRbsE061u4][RubyConf 2009 - SOLID Ruby by: Jim Weirich]]

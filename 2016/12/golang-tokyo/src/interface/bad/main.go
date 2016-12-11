@@ -2,6 +2,7 @@ package main
 
 import "log"
 
+// START OMIT
 func main() {
 	redis := &Redis{
 		addr: ":6379",
@@ -11,13 +12,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	_ = name
+	// ...
 }
 
 func process(redis *Redis) (string, error) {
 	return redis.Get("name")
 }
+
+// END OMIT
 
 type Redis struct {
 	addr string
