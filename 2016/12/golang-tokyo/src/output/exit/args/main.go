@@ -2,6 +2,7 @@ package main
 
 import "os"
 
+// START OMIT
 func main() {
 	os.Exit(Run(os.Args))
 }
@@ -17,6 +18,8 @@ func Run(args []string) int {
 
 	return 0
 }
+
+// END OMIT
 
 func process1() error {
 	return nil

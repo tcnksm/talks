@@ -18,10 +18,6 @@ func TestAskDeploy(t *testing.T) {
 			bytes.NewBufferString("n\n"),
 			false,
 		},
-		{
-			bytes.NewBufferString("\n"),
-			false,
-		},
 	}
 
 	for _, tc := range cases {

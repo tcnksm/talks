@@ -16,13 +16,6 @@ func TestLoadConfig(t *testing.T) {
 				Name: "deeeet",
 			},
 		},
-
-		{
-			path: "test-fixture/golang-tokyo2.json",
-			expect: &Config{
-				Name: "tcnksm",
-			},
-		},
 	}
 
 	for _, tc := range cases {

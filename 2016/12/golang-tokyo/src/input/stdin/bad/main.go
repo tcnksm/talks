@@ -17,7 +17,7 @@ func main() {
 	log.Println("Deploy!")
 }
 
-// AskDeploy askes user ok to deploy or not
+// Yes/Noでユーザに回答を求める
 func AskDeploy() bool {
 
 	fmt.Println("Do you want to deploy? [y/N]")

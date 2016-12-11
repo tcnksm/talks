@@ -19,6 +19,7 @@ func main() {
 	}
 }
 
+// START OMIT
 func SaveConfig(config *Config, filename string) error {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -35,6 +36,8 @@ func Save(config *Config, w io.Writer) error {
 	}
 	return nil
 }
+
+// END OMIT
 
 type Config struct {
 	Name string `json:"name"`

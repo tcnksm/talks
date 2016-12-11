@@ -10,15 +10,8 @@ func TestRun(t *testing.T) {
 		Command string
 		Status  int
 	}{
-		{
-			"cool-command -config test.json arg1 arg2",
-			0,
-		},
-
-		{
-			"cool-command -v",
-			1,
-		},
+		{"cool-command -config test.json arg1 arg2", 0},
+		{"cool-command -v", 1},
 	}
 
 	for _, tc := range cases {

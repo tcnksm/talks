@@ -55,9 +55,9 @@ Packages
 
 * なぜテストが難しくなってしまうのか?
 
-- 関数に対する「入力」がコントロールしきれていない
+- 関数の「入力」がコントロールできていない
 - 関数の「出力」や「外界への影響（副作用）」を取り出せない
-- 関数の依存を抽象化できていない
+- 外界への依存を抽象化できていない
 
 * テストできないコードはない
 
@@ -96,3 +96,345 @@ Packages
 
 [[https://golang.org/doc/faq#Packages_Testing][Where is my favorite helper function for testing?]]
 
+* テストしやすいコードとは?
+
+* Table Driven Test
+
+* Table Driven Test
+
+[[https://github.com/golang/go/wiki/TableDrivenTests][TableDrivenTests]]
+
+.code src/table/simple_test.go /^func Add/,/^}/
+.code src/table/simple_test.go /^func Test/,/^}/
+
+* Table Driven Test
+
+なぜTable Driven Testを使うのか?
+
+- 入力が何で出力に何を期待するかを簡単に理解できる
+- 簡単にテストケースを追加することができる
+
+Golangでテストを書くときはとにかくTable Driven Testを使う
+
+* Table Driven Test (http.Handler)
+
+.code src/table/handler_test.go /^func hello/,/^}/
+
+* Table Driven Test (http.Handler)
+
+.code src/table/handler_test.go /^func Test/,/^}/
+
+* Table Driven Test (Compiler)
+
+[[https://interpreterbook.com/][Writing An Interpreter In Go]]
+
+.code src/table/compiler_test.go /^func Test/,/^}/
+
+* テストしやすいコードとは?
+
+Table Driven Testに落とし込めるコードである
+
+どれだけ複雑な（複雑に見える）アプリケーションのコードもTable Driven Testの形式/粒度に落とし込むことが大切である
+
+* テストしにくいコードとは?
+
+* テストしにくいコードとは?
+
+- 関数の「入力」がコントロールできていない
+- 関数の「出力」や「外界への影響（副作用）」を取り出せない
+- 外界への依存を抽象化できていない
+
+* 関数の「入力」がコントロールできていない
+
+入力を変更できない/変更しにくい
+
+- *コード内での入力*
+- コード外からの入力
+
+* コントロールできないコード内の入力
+
+- グローバル変数
+
+* グローバル変数
+
+テストしにくい例
+
+.code src/global/bad/main.go /START OMIT/,/END OMIT/
+
+様々な設定ファイルをテストしたい場合にどうすればよいか?
+
+* グローバル変数
+
+テストしやすい例
+
+.code src/global/config.go /^func Load/,/^}/
+
+グローバル変数ではなく引数として明示的に渡す
+
+* グローバル変数
+
+Table Driven Testに落とし込める！
+
+.code src/global/main_test.go /^func Test/,/^}/
+
+* グローバル変数はどこで使うべきか
+
+デフォルト値の設定にのみ利用する．なるべくmain関数でローカル変数に代入する．
+
+.code src/global/main.go /START OMIT/,/END OMIT/
+
+どこでも呼べるとコードの可読性が下がる
+
+* flagどこに定義するか問題
+
+[[https://robots.thoughtbot.com/where-to-define-command-line-flags-in-go][Where to Define Command-Line Flags in Go]]
+
+CLIツールを書くときに`flag`パッケージを主に利用する．`flag.String`や`flag.Int`でフラグを定義して`flag.Parse()`を呼ぶのがRequirementである．どこで定義するべきか?
+
+* flagどこに定義するか問題
+
+良くない例（... が多く見かける）
+
+.code src/global/flag/bad/main.go /START OMIT/,/END OMIT/
+
+なぜ良くないか?（楽しようとして横着するやつが登場するかもしれない）
+
+.code src/global/flag/bad/main.go /^func Future/,/^}/
+
+
+* flagどこに定義するか問題
+
+良い例（main関数内で定義する）
+
+.code src/global/flag/main.go /^func main/,/^}/
+
+* 入力をコントロールしやすくする
+
+基本的に設定が同じものも変更可能にして「明示的に」入力として渡す
+
+.code src/global/opt/main.go /^type/,/^}/
+
+* 関数の「入力」がコントロールできていない
+
+入力を変更できない/変更しにくい
+
+- コード内での入力
+- *コード外からの入力*
+
+* コントロールしにくいコード外からの入力
+
+- 環境変数
+- 標準入力
+- コマンドライン引数
+
+* 環境変数
+
+良くない例（環境変数はグローバル変数のようにどこからでも取得できてしまう...）
+
+.code src/input/env/bad/client.go /^func/,/^}/
+
+* 環境変数
+
+main関数でローカル変数に代入して明示的に引数として渡す
+
+.code src/input/env/client.go /^func New/,/^}/
+
+.code src/input/env/client.go /^func main/,/^}/
+
+入力の「入り口」を制限する！
+
+* 標準入力
+
+良くない例
+
+.code src/input/stdin/bad/main.go /^func Ask/,/^}/
+
+どうすればこの関数はテストできるようになるか?
+
+* 標準入力
+
+良い例（`io.Reader`を渡す）
+
+.code src/input/stdin/main.go /^func Ask/,/^}/
+
+* 標準入力
+
+良い例（`io.Reader`を渡す）
+
+.code src/input/stdin/main.go /^func main/,/^}/
+
+（`os.Stdin`は`io.Reader`で抽象化できる！）
+
+* 標準入力
+
+Table Driven Testに落とし込める！（`os.Stdin`の代わりに`*bytes.Buffer`を渡す）
+
+.code src/input/stdin/main_test.go /^func Test/,/^}/
+
+* コマンドライン引数
+
+（後述）
+
+* デザインの指標（入力）
+
+- グローバル変数を避ける（使ってもデフォルト値のみで使う）
+- なるべく設定可能にして「明示的に」入力として渡せるようにする
+- コード外からの入力はmain関数でローカル変数に取り込む（入り口を制限する）
+- `os.Stdin`は`io.Reader`で抽象化する
+
+* テストしにくいコードとは?
+
+- 関数の「入力」がコントロールできていない
+- *関数の「出力」や「外界への影響（副作用）」を取り出せない*
+- 外界への依存を抽象化できていない
+
+* 出力が取り出せない
+
+もっともテストしにくい関数はvoid的な（明確な返り値を持たない）関数である
+
+void的な関数はmainだけにする！
+
+全ての関数が「明確な」入力と出力を持つように意識する
+
+* 出力が取り出せない
+
+「すごいHaskell楽しく学ぼう」より
+
+命令型言語では，一見すると数を処理するだけに見える簡単な関数が処理の手間にあなたの家に火をつけたり犬を誘拐したりしないことを保証できません
+
+Haskellはプログラムの「純粋な」部分と，キーボードや画面とやり取りするような全ての汚い仕事をする「不純な」部分をきっちりと分離します
+
+* 出力が取り出せない
+
+いかに「不純な」部分を扱いテストしやすくするか
+
+- ファイル出力
+- 標準出力/標準エラー出力
+- 終了コード
+
+* ファイル出力
+
+良くない例
+
+.code src/output/file/bad/main.go /^func SaveConfig/,/^}/
+
+どうすればこの関数はテストしやすくなるか?
+
+* ファイル出力
+
+良い例（実際の書き出しを`io.Writer`に対して行う）
+
+.code src/output/file/main.go /START OMIT/,/END OMIT/
+
+* ファイル出力
+
+Table Driven Testに落とし込める！（*bytes.Bufferを渡す）
+
+.code src/output/file/main_test.go /^func Test/,/^}/
+
+* 標準出力/標準エラー出力
+
+良くない例
+
+.code src/output/stdout/bad/main.go /START OMIT/,/END OMIT/
+
+どうすればこの関数はテストしやすくなるか?
+
+* 標準出力/標準エラー出力
+
+`fmt.Printf`は「暗黙的に」`os.Stdout`を出力先として設定している
+
+    // Printf formats according to a format specifier and writes to standard output.
+    // It returns the number of bytes written and any write error encountered.
+    func Printf(format string, a ...interface{}) (n int, err error) {
+        return Fprintf(os.Stdout, format, a...)
+    }
+
+* 標準出力/標準エラー出力
+
+良い例（実際の書き出しを`io.Writer`に対して行う）
+
+.code src/output/stdout/main.go /START OMIT/,/END OMIT/
+
+main関数で`os.Stdout`を「明示的に」設定する
+
+.code src/output/stdout/main.go /^func main/,/^}/
+
+* 標準出力/標準エラー出力
+
+とはいえやりすぎは良くない．コンソールへの出力が重要な機能である場合にやるべき
+
+* 終了コード
+
+良くない例
+
+.code src/output/exit/bad/main.go /^func main/,/^}/
+
+どうすればこの関数はテストできるか?
+
+* 終了コード
+
+（少し）良い例（ステータスコードを「返り値として返す」関数を定義する）
+
+.code src/output/exit/main.go /START OMIT/,/END OMIT/
+
+`os.Exit`はmain関数のみで呼ぶ．出口を制限する！
+
+ただし今のままでは「入力がない」ため`Run`関数をテストできない．どうするか?
+
+
+* 終了コード + コマンドライン引数
+
+良い例（コマンドライン引数を`Run`関数に渡せるようにする）
+
+.code src/output/exit/args/main.go /START OMIT/,/END OMIT/
+
+* 終了コード + コマンドライン引数 + flag引数
+
+もっと良い例（flag引数をParseする）
+
+.code src/output/exit/flags/main.go /START OMIT/,/END OMIT/
+
+* 終了コード + コマンドライン引数 + flag引数
+
+Table Driven Testに落とし込める！
+
+.code src/output/exit/flags/main_test.go /^func Test/,/^}/
+
+* 終了コード + コマンドライン引数 + flag引数
+
+ただしこれはIntegrationテストに近い．
+
+それよりも内部で呼び出している関数，ここで言うと`process1`や`process2`，のUnitテストをちゃんとやるのが大切である．
+
+* 終了コード
+
+その他の方法
+
+- [[http://mattn.kaoriya.net/software/lang/go/20161025113154.htm][golang で終了を確認するテストの書き方]]
+
+* デザインの指標（出力）
+
+- void的な関数を避ける
+- io.Writerを使う！
+- main関数で`os.Stdout`/`os.Stdin`を「入力として」渡す
+- `os.Exit`はmainでのみ呼ぶ（「出口」を制限する）
+- （`os.Args`を引数として渡す）
+
+* テストしにくいコードとは?
+
+- 関数の「入力」がコントロールできていない
+- 関数の「出力」や「外界への影響（副作用）」を取り出せない
+- *外界への依存を抽象化できていない*
+
+* 外界への依存を抽象化できていない
+
+ある関数は外部のサービスやDBに依存する．
+
+Interfaceを使い依存をモック化する．
+
+* Interfaceによるモック
+
+良くない例
+
+.code src/interface/bad/main.go /START OMIT/,/END OMIT/

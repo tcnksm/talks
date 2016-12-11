@@ -16,7 +16,7 @@ func TestSaveConfig(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		var buf bytes.Buffer // io.Writer
+		var buf bytes.Buffer // 🙆
 		if err := Save(tc.Config, &buf); err != nil {
 			t.Fatal(err)
 		}

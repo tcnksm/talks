@@ -14,6 +14,7 @@ func main() {
 	calc.DisplayAdd(1, 2)
 }
 
+// START OMIT
 type Calculator struct {
 	output io.Writer
 }
@@ -21,3 +22,5 @@ type Calculator struct {
 func (c *Calculator) DisplayAdd(i, j int) {
 	fmt.Fprintf(c.output, "%d + %d = %d\n", i, j, i+j)
 }
+
+// END OMIT

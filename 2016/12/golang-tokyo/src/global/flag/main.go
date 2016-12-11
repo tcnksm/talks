@@ -10,9 +10,7 @@ import (
 const defaultConfigPath = "./golang-tokyo.json"
 
 func main() {
-	var (
-		cfgPath = flag.String("config", defaultConfigPath, "")
-	)
+	var cfgPath = flag.String("config", defaultConfigPath, "") // 🙆
 	flag.Parse()
 
 	config, err := LoadConfig(*cfgPath)

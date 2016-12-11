@@ -9,6 +9,7 @@ import (
 
 const defaultConfigPath = "./golang-tokyo.json"
 
+// START OMIT
 var cfgPath = flag.String("config", defaultConfigPath, "")
 
 func main() {
@@ -21,11 +22,11 @@ func main() {
 	log.Println("Hello,", config.Name)
 }
 
+// END OMIT
+
 func FutureStupidFunction() {
 	f, err := os.Open(*cfgPath)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// ...
 }
 
 func LoadConfig(path string) (*Config, error) {

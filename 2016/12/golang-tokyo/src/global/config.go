@@ -2,15 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 )
 
-// START OMIT
-var configPath = "./golang-tokyo.json"
-
-func LoadConfig() (*Config, error) {
-	f, err := os.Open(configPath)
+func LoadConfig(cfgPath string) (*Config, error) {
+	f, err := os.Open(cfgPath)
 	if err != nil {
 		return nil, err
 	}
@@ -23,17 +19,6 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return config, err
-}
-
-// END OMIT
-
-func main() {
-	config, err := LoadConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Hello,", config.Name)
 }
 
 type Config struct {

@@ -6,6 +6,7 @@ func Add(i, j int) int {
 	return i + j
 }
 
+// START OMIT
 func TestAdd(t *testing.T) {
 	cases := []struct {
 		Input1, Input2 int
@@ -22,3 +23,5 @@ func TestAdd(t *testing.T) {
 		}
 	}
 }
+
+// END OMIT
