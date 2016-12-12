@@ -1,13 +1,26 @@
 package main
 
-import "os"
+import (
+	"io"
+	"os"
+)
 
 // START OMIT
 func main() {
-	os.Exit(Run(os.Args))
+	cli := &CLI{
+		out: os.Stdout,
+		err: os.Stderr,
+	}
+	os.Exit(cli.Run(os.Args))
 }
 
-func Run(args []string) int {
+type CLI struct {
+	out io.Writer
+	err io.Writer
+}
+
+func (c *CLI) Run(args []string) int {
+
 	if err := process1(); err != nil {
 		return 1
 	}
