@@ -25,11 +25,10 @@ func SaveConfig(config *Config, filename string) error {
 	if err != nil {
 		return err
 	}
-
-	return Save(config, f)
+	return save(config, f)
 }
 
-func Save(config *Config, w io.Writer) error {
+func save(config *Config, w io.Writer) error {
 	endcoder := json.NewEncoder(w)
 	if err := endcoder.Encode(config); err != nil {
 		return err

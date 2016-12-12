@@ -16,7 +16,7 @@ func main() {
 }
 
 func process(redis *Redis) (string, error) {
-	return redis.Get("name")
+	// ...
 }
 
 // END OMIT

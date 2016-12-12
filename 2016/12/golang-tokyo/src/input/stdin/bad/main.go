@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -21,9 +18,9 @@ func main() {
 func AskDeploy() bool {
 
 	fmt.Println("Do you want to deploy? [y/N]")
-	reader := bufio.NewReader(os.Stdin)
-	line, err := reader.ReadString('\n')
-	if err != nil && err != io.EOF {
+
+	var line string
+	if _, err := fmt.Scanln(&line); err != nil {
 		return false
 	}
 

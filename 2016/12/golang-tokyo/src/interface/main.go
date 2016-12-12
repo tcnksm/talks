@@ -17,7 +17,7 @@ func main() {
 }
 
 func process(db DB) (string, error) {
-	return db.Get("name")
+	// ...
 }
 
 func NewRedis(addr string) DB {

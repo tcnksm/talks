@@ -10,14 +10,8 @@ func TestAskDeploy(t *testing.T) {
 		Input *bytes.Buffer
 		Want  bool
 	}{
-		{
-			bytes.NewBufferString("Y\n"),
-			true,
-		},
-		{
-			bytes.NewBufferString("n\n"),
-			false,
-		},
+		{bytes.NewBufferString("Y\n"), true},
+		{bytes.NewBufferString("n\n"), false},
 	}
 
 	for _, tc := range cases {

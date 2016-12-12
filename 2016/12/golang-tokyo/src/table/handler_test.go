@@ -36,7 +36,6 @@ func TestHandler(t *testing.T) {
 		if got, want := w.Code, tc.Status; got != want {
 			t.Fatalf("StatusCode=%d, want=%d", got, want)
 		}
-
 		if got, want := w.Body.String(), tc.Body; got != want {
 			t.Fatalf("Body=%q, want=%q", got, want)
 		}

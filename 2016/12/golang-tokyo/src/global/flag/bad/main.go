@@ -10,7 +10,7 @@ import (
 const defaultConfigPath = "./golang-tokyo.json"
 
 // START OMIT
-var cfgPath = flag.String("config", defaultConfigPath, "")
+var cfgPath = flag.String("config", defaultConfigPath, "") // グローバル変数として定義
 
 func main() {
 	flag.Parse()

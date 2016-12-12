@@ -6,7 +6,7 @@ import (
 )
 
 func NewClient() (*Client, error) {
-	token := os.Getenv("GT_TOKEN") // 😇
+	token := os.Getenv("GT_TOKEN")
 	if len(token) == 0 {
 		return nil, fmt.Errorf("missing token")
 	}
