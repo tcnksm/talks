@@ -7,11 +7,8 @@ import (
 
 // START OMIT
 func main() {
-	cli := &CLI{
-		out: os.Stdout,
-		err: os.Stderr,
-	}
-	os.Exit(cli.Run(os.Args))
+
+	os.Exit(Run(os.Args))
 }
 
 type CLI struct {
@@ -19,8 +16,7 @@ type CLI struct {
 	err io.Writer
 }
 
-func (c *CLI) Run(args []string) int {
-
+func Run(args []string) int {
 	if err := process1(); err != nil {
 		return 1
 	}
