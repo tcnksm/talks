@@ -1,0 +1,268 @@
+Go 1.8 Release Party in Tokyo
+GoCon Tokyo
+16 Feb 2017
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[http://deeeet.com][http://deeeet.com]]
+- SRE/BSE at Mercari, Inc.
+
+* Welcome
+
+Let's celebrate the release of Go1.8.
+
+* Welcome
+
+This slide is based on:
+
+- [[http://beta.golang.org/doc/go1.8][Go 1.8 Release Notes]]
+- [[https://github.com/davecheney/go-1.8-release-party][https://github.com/davecheney/go-1.8-release-party]]
+- [[https://talks.golang.org/2017/state-of-go.slide/#1][https://talks.golang.org/2017/state-of-go.slide/#1]]
+
+* Go 1.8
+
+The latest Go release, version 1.8, arrives six months after Go 1.7.
+
+Most of its changes are in the implementation of the toolchain, runtime, and libraries. There are two minor changes to the language specification.
+
+As always, the release maintains the [[http://tip.golang.org/doc/go1compat.html][Go 1 compatibility guarantee]].
+
+Almost all Go programs are expected to continue to compile and run as before.
+
+* Changes to the language
+
+* Changes to the language
+
+- Struct conversion
+
+* Struct conversion
+
+Before
+
+.code src/struct_before.go /START OMIT/,/END OMIT/
+
+* Struct conversion
+
+After
+
+.code src/struct.go /START OMIT/,/END OMIT/
+
+When explicitly converting a value from one struct type to another, as of Go 1.8 the tags are ignored.
+
+
+* New ports
+
+- 32-bit MIPS on Linux for both big-endian (linux/mips) and little-endian
+- On DragonFly BSD, Go now requires DragonFly 4.4.4 or later
+- On OpenBSD, Go now requires OpenBSD 5.9 or later
+- The Plan 9 port's networking support is now much more complete
+- Go 1.8 now only supports OS X 10.8 (Mountain Lion) or later
+
+* Tools
+* Tools
+
+- Compiler Toolchain
+- Default $GOPATH
+- Fix
+- Vet
+- Bug
+
+* Compiler Toolchain (SSA)
+
+Go 1.7 introduced a new compiler back end for 64-bit x86 systems. In Go 1.8, that back end has been developed further and is now used for all architectures.
+
+The new back end, based on static single assignment form (SSA), generates more compact, more efficient code and provides a better platform for optimizations such as bounds check elimination.
+
+For 64-bit x86 systems, which already used the SSA back end in Go 1.7, the gains are a more modest 0-10%.
+
+References
+
+- [[https://pauladamsmith.com/blog/2016/08/go-1.7-ssa.html][Looking at your program’s structure in Go 1.7]]
+
+* Compiler Toolchain (build time)
+
+The compiler and linker have been optimized and run faster in this release than in Go 1.7, although they are still slower than we would like and will continue to be optimized in future releases. Compared to the previous release, Go 1.8 is about 15% faster.
+
+
+.image https://dave.cheney.net/wp-content/uploads/2016/11/Screenshot-2016-11-19-at-08.57.10.png 300 _
+.caption [[https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements][Go 1.8 toolchain improvements]]
+
+* Compiler Toolchain (new parser)
+
+In addition to enabling the new compiler back end for all systems, Go 1.8 also introduces a new compiler front end. The new compiler front end should not be noticeable to users but is the foundation for future performance work.
+
+* Default $GOPATH
+
+The GOPATH environment variable now has a default value ([[https://github.com/golang/go/issues/17262][#17262]])
+
+- `$HOME/go` on Unix
+- `%USERPROFILE%/go` on Windows
+
+Even though you don't have care about setting this variable, there are few items that still requires your attention.
+
+- Users still need to add `$GOPATH/bin` into their `$PATH` to run binaries installed by go get and go install.
+- The users who are developing with the Go language still need to understand that the presence of `$GOPATH`, its location and its structure.
+
+[[http://golang.rakyll.org/default-gopath/][The default GOPATH · Go, the unwritten parts]]
+
+
+* Fix
+
+The fix tool has a new "context" fix to change imports from "golang.org/x/net/context" to "context".
+
+.code src/fix.go /START OMIT/,/END OMIT/
+
+  $ go tool fix -diff -force=context src/fix.go
+
+* Vet
+
+Vet now checks
+
+- copying an array of locks
+- duplicate JSON and XML struct field tag
+- non-space-separated struct tags
+- deferred calls to HTTP Response.Body.Close before checking errors
+- indexed arguments in Printf
+
+* Vet
+
+deferred calls to HTTP Response.Body.Close before checking errors
+
+.code src/vet1.go /^func main/,/^}/
+
+  $ go vet src/vet1.go
+  src/vet1.go:10: using res before checking for errors
+  exit status 1
+
+
+* Vet
+
+duplicate JSON and XML struct field tag
+
+.code src/vet2.go /type/,/}/
+
+  $ go vet src/vet2.go
+  src/vet2.go:7: struct field PhoneNumber repeats json tag "number" also at src/vet2.go:5
+  exit status 1
+
+* Bug 
+
+The new [[http://beta.golang.org/cmd/go/#hdr-Print_information_for_bug_reports][go bug command]] starts a bug report on GitHub, prefilled with information about the current system.
+
+  $ go bug
+
+.image img/gobug.png 400 _
+
+* Performance
+* Performance
+
+As always, the changes are so general and varied that precise statements about performance are difficult to make.
+
+Most programs should run a bit faster, due to speedups in the garbage collector and optimizations in the standard library.
+
+* Performance
+
+- GC
+- Defer
+- Cgo
+
+* GC
+
+Garbage collection pauses should be significantly shorter than they were in Go 1.7, usually under 100 microseconds and often as low as 10 microseconds.
+
+See the document on [[https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md][Eliminate STW stack re-scanning]]
+
+
+* Defer
+
+The overhead of deferred function calls has been reduced by about half.
+
+  name         old time/op  new time/op  delta
+  Defer-4        75.1ns ± 1%  43.3ns ± 1%  -42.31%   (p=0.000 n=8+10)
+  DeferLock-4    77.4ns ± 1%  43.9ns ± 1%  -43.31%  (p=0.000 n=10+10)
+  NoDeferLock-4  16.0ns ± 0%  15.9ns ± 0%   -0.39%    (p=0.000 n=9+8)
+
+.caption [[https://go-review.googlesource.com/#/c/29656/][https://go-review.googlesource.com/#/c/29656/]]
+
+
+* Cgo
+
+The overhead of calls from Go into C has been reduced by about half.
+
+  name       old time/op  new time/op  delta
+  CgoNoop-8  93.5ns ± 0%  51.1ns ± 1%  -45.34%  (p=0.016 n=4+5)
+
+.caption [[https://go-review.googlesource.com/#/c/30080/][https://go-review.googlesource.com/#/c/30080/]]
+
+* Standard library
+
+- Sort
+- HTTP2/Push
+- HTTP Server Graceful Shutdown
+- More Context Support
+- Mutex Contention Profiling
+
+* Sort
+
+Before
+
+.code src/sort_before.go /START OMIT/,/END OMIT/
+
+* Sort
+
+From Go1.8, writing a new sorter type is not necessary.
+
+.code src/sort.go /^func main/,/^}/
+
+* HTTP2/Push
+
+The net/http package now includes a mechanism to send HTTP/2 server pushes from a Handler.
+
+.code src/push.go /START OMIT/,/END OMIT/
+
+* HTTP2/Push (Casper)
+
+Current server push problem is no way to know *when-to-push*. Browser will cache assets so it's waste of waste of the network bandwidth (and cause negative effects on response time), you should avoid to push the asset which has already been cached by the client.
+
+So when to push ? Cache aware server push (CASPer) [[https://github.com/tcnksm/go-casper][tcnksm/go-casper]] ported from [[https://github.com/h2o/h2o][h2o]]
+
+.code src/casper.go /START OMIT/,/END OMIT/
+
+* HTTP Server Graceful Shutdown
+
+The HTTP Server now has support for graceful shutdown of the server without interrupting any active connections.
+
+- [[https://github.com/mercari/widebullet/pull/10][https://github.com/mercari/widebullet/pull/10]]
+- [[https://github.com/mercari/gaurun/pull/57][https://github.com/mercari/gaurun/pull/57]]
+
+* More Context Support
+
+Since Go 1.7:
+
+- net
+- net/http
+- os/exec
+
+Since Go 1.8:
+
+- http.Server.Shutdown
+- database/sql
+- net.Resolver
+
+* Mutex Contention Profiling
+
+* More HTTP Tracing
+
+[[https://github.com/tcnksm/go-httpstat][https://github.com/tcnksm/go-httpstat]]
+
+* Standard library
+
+And a lot of minor changes 👍
+
+See more on [[http://beta.golang.org/doc/go1.8][Go 1.8 Release Notes]]
