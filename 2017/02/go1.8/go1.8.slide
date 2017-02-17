@@ -13,17 +13,28 @@ Taichi Nakashima
 - [[http://deeeet.com][http://deeeet.com]]
 - SRE/BSE at Mercari, Inc.
 
+
+* Welcome
+
+パーティー失敗?（6ヶ月ぶり3度目)
+
+.image https://raw.github.com/davecheney/go-1.8-release-party/master/img/rocket.jpg 400 _
+
 * Welcome
 
 Let's celebrate the release of Go1.8.
 
 * Welcome
 
-This slide is based on:
+This is world-wide golang release party! There are more than 70 Go user groups taking part, you can find [[https://github.com/golang/go/wiki/Go-1.8-Release-Party][a list of them here]].
+
+This presentation is based _heavily_ on,
 
 - [[http://beta.golang.org/doc/go1.8][Go 1.8 Release Notes]]
 - [[https://github.com/davecheney/go-1.8-release-party][https://github.com/davecheney/go-1.8-release-party]]
 - [[https://talks.golang.org/2017/state-of-go.slide/#1][https://talks.golang.org/2017/state-of-go.slide/#1]]
+
+Thanks Dave Cheney and Francesc Campoy!
 
 * Go 1.8
 
@@ -72,6 +83,7 @@ When explicitly converting a value from one struct type to another, as of Go 1.8
 - Fix
 - Vet
 - Bug
+- Plugins
 
 * Compiler Toolchain (SSA)
 
@@ -85,12 +97,17 @@ References
 
 - [[https://pauladamsmith.com/blog/2016/08/go-1.7-ssa.html][Looking at your program’s structure in Go 1.7]]
 
+* Compiler Toolchain (SSA)
+
+See how SSA improves your code (e.g., main function)
+
+  $ GOSSAFUNC=main go build && open ssa.html 
+
 * Compiler Toolchain (build time)
 
 The compiler and linker have been optimized and run faster in this release than in Go 1.7, although they are still slower than we would like and will continue to be optimized in future releases. Compared to the previous release, Go 1.8 is about 15% faster.
 
-
-.image https://dave.cheney.net/wp-content/uploads/2016/11/Screenshot-2016-11-19-at-08.57.10.png 300 _
+.image https://dave.cheney.net/wp-content/uploads/2016/11/Screenshot-2016-11-19-at-08.57.10.png 400 _
 .caption [[https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements][Go 1.8 toolchain improvements]]
 
 * Compiler Toolchain (new parser)
@@ -159,6 +176,20 @@ The new [[http://beta.golang.org/cmd/go/#hdr-Print_information_for_bug_reports][
 
 .image img/gobug.png 400 _
 
+* Plugins
+
+Go now provides early support for plugins with a plugin build mode for generating plugins written in Go, and a new plugin package for loading such plugins at run time. Plugin support is currently only available on Linux.
+
+  $ go build -buildmode=plugin
+
+[[https://github.com/campoy/golang-plugins][https://github.com/campoy/golang-plugins]] uses the new plugin feature of Go 1.8 to implement hot code swapping in Go.
+
+RPC plugins
+
+- [[https://github.com/hashicorp/go-plugin][https://github.com/hashicorp/go-plugin]]
+- [[https://github.com/cloudfoundry/cli][https://github.com/cloudfoundry/cli]]
+
+
 * Performance
 * Performance
 
@@ -177,6 +208,8 @@ Most programs should run a bit faster, due to speedups in the garbage collector 
 Garbage collection pauses should be significantly shorter than they were in Go 1.7, usually under 100 microseconds and often as low as 10 microseconds.
 
 See the document on [[https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md][Eliminate STW stack re-scanning]]
+
+[[https://talks.golang.org/2017/state-of-go.slide#34][https://talks.golang.org/2017/state-of-go.slide#34]]
 
 
 * Defer
@@ -238,8 +271,16 @@ So when to push ? Cache aware server push (CASPer) [[https://github.com/tcnksm/g
 
 The HTTP Server now has support for graceful shutdown of the server without interrupting any active connections.
 
+.code src/grace.go /START OMIT/,/END OMIT/
+
+* HTTP Server Graceful Shutdown
+
+Hot deploy with [[https://github.com/lestrrat/go-server-starter][https://github.com/lestrrat/go-server-starter]]
+
 - [[https://github.com/mercari/widebullet/pull/10][https://github.com/mercari/widebullet/pull/10]]
 - [[https://github.com/mercari/gaurun/pull/57][https://github.com/mercari/gaurun/pull/57]]
+
+(Although, in my opinion, it should be handled by platform itself, not by server itself )
 
 * More Context Support
 
@@ -255,11 +296,27 @@ Since Go 1.8:
 - database/sql
 - net.Resolver
 
-* Mutex Contention Profiling
+* More httptrace 
 
-* More HTTP Tracing
+Go1.7 introduced `httptrace` package which provides a number of hooks to gather information during an HTTP round trip about a variety of events.
 
-[[https://github.com/tcnksm/go-httpstat][https://github.com/tcnksm/go-httpstat]]
+This package is used by [[https://github.com/davecheney/httpstat][davecheney/httpstat]]
+
+  $ httpstat golang.org
+
+* More httptrace
+
+[[https://github.com/tcnksm/go-httpstat][tcnksm/go-httpstat]] can enable it for `http.Client`
+
+.code src/httpstat.go /^func main/,/}/
+
+  go run src/httpstat.go
+
+* More httptrace
+
+Go1.8 supports for tracing a client request's TLS handshakes with the new `ClientTrace.TLSHandshakeStart` and `ClientTrace.TLSHandshakeDone`.
+
+- [[https://github.com/tcnksm/go-httpstat/pull/10][tcnksm/go-httpstat#10]] (Support for this hook)
 
 * Standard library
 
