@@ -59,8 +59,12 @@ Almost all Go programs are expected to continue to compile and run as before.
 
 First, introduce the new API. The old and new API must be interchangeable, meaning that it must be possible to convert individual uses from the old to the new API without changing the overall behavior of the program, and uses of the old and new APIs must be able to coexist in a single program. Second, across as many commits as you need, convert all the uses of the old API to the new API. Third, remove the old API.
 
+* Type alias (example)
 
-* Type aliases (why?)
+[[https://talks.golang.org/2017/state-of-go-may.slide#9][https://talks.golang.org/2017/state-of-go-may.slide#9]]
+
+
+* Type aliases
 
 In short, a type alias declaration has the form:
 
