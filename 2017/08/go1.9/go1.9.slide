@@ -1,0 +1,203 @@
+Go 1.9 Release Party in Tokyo
+GoCon Tokyo
+22 Aug 2017
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[http://deeeet.com][http://deeeet.com]]
+- SRE/BSE at Mercari, Inc.
+
+* Welcome
+
+パーティー失敗?（6ヶ月ぶり4度目)
+
+- [[https://gocon.connpass.com/event/48281/][Go 1.8 Release Party in Tokyo...失敗]]
+- [[https://gocon.connpass.com/event/37332/][Go 1.7 Release Party in Tokyo...失敗]]
+- [[https://gocon.connpass.com/event/26572/][Go 1.6 Release Party in Tokyo...失敗]]
+
+* Welcome
+
+Let's celebrate the release of Go1.9.
+
+This is world-wide golang release party! See wiki [[https://github.com/golang/cowg/blob/party/events/2017-08-go1.9-release-party.md][Go 1.9 Release Party]]
+
+This presentation is based _heavily_ on,
+
+- [[https://tip.golang.org/doc/go1.9][Go 1.9 Release Notes]]
+- [[http://talks.godoc.org/github.com/davecheney/go-1.9-release-party/presentation.slide#1][Go 1.9 Release Party]]
+- [[https://talks.golang.org/2017/state-of-go-may.slide#1][The State of Go]]
+
+Thanks Dave Cheney and Francesc Campoy!
+
+* Go 1.9
+
+The latest Go release, version 1.9, arrives six months after Go 1.8.
+
+There are two changes to the language. But most of its changes are in the implementation of the toolchain, runtime, and libraries. 
+
+As always, the release maintains the [[http://tip.golang.org/doc/go1compat.html][Go 1 compatibility guarantee]].
+
+Almost all Go programs are expected to continue to compile and run as before.
+
+* Changes to the language
+* Changes to the language
+
+- Type aliases
+
+* Type aliases (why?)
+
+[[https://talks.golang.org/2016/refactor.article][Codebase Refactoring (with help from Go)]]
+
+
+.image https://talks.golang.org/2016/refactor/gradual.svg 300 _
+
+First, introduce the new API. The old and new API must be interchangeable, meaning that it must be possible to convert individual uses from the old to the new API without changing the overall behavior of the program, and uses of the old and new APIs must be able to coexist in a single program. Second, across as many commits as you need, convert all the uses of the old API to the new API. Third, remove the old API.
+
+
+* Type aliases (why?)
+
+In short, a type alias declaration has the form:
+
+  type T1 = T2
+  
+This declaration introduces an alias name T1—an alternate spelling—for the type denoted by T2; that is, both T1 and T2 denote the same type.
+
+* Tools
+* Tools
+
+- Parallel Compilation
+- Vendor matching with ./...
+- Doc
+- Env
+- Test
+- Pprof
+
+* Parallel Compilation
+
+The go tool has always compiled runtime.NumCPUs() packages in parallel.
+
+With Go 1.9, inside a single package functions are now compiled in parallel.
+
+* Vendor matching with ./...
+
+NO MORE
+
+  go test $(go list ./... | grep -v vendor)
+
+* Doc
+
+Viewing documentation on struct fields is now supported. For example, go doc http.Client.Jar.
+
+  $ go doc http.Client.Jar
+  type Client struct {
+    // Jar specifies the cookie jar.
+    //
+    // The Jar is used to insert relevant cookies into every
+    // outbound Request and is updated with the cookie values
+    // of every inbound Response. The Jar is consulted for every
+    // redirect that the Client follows.
+    //
+    // If Jar is nil, cookies are only sent if they are explicitly
+    // set on the Request.
+    Jar CookieJar
+
+    // ... other fields elided ...
+  }
+
+* Env
+
+The new go env -json flag enables JSON output.
+
+  $ go env -json
+  {
+        "CC": "clang",
+        "CGO_CFLAGS": "-g -O2",
+        "CGO_CPPFLAGS": "",
+        "CGO_CXXFLAGS": "-g -O2",
+        "CGO_ENABLED": "1",
+        ...
+  }
+
+
+* Test
+
+The go test command accepts a new -list flag, which takes a regular expression as an argument and prints to stdout the name of any tests, benchmarks, or examples that match it, without running them.
+
+  $ go test net/http -list Client
+  TestClient
+  TestClientHead_h1
+  TestClientHead_h2
+  TestClientRedirects
+  ...
+  
+* Pprof
+
+Profiles produced by the runtime/pprof package now include symbol information, so they can be viewed in go tool pprof without the binary that produced the profile.
+
+* Performance
+* Performance
+
+As always, the changes are so general and varied that precise statements about performance are difficult to make.
+
+* Performance (Garbage collector)
+
+Library functions that used to trigger stop-the-world garbage collection now trigger concurrent garbage collection. Specifically, runtime.GC, debug.SetGCPercent, and debug.FreeOSMemory, now trigger concurrent garbage collection, blocking only the calling goroutine until the garbage collection is done.
+
+Large object allocation performance is significantly improved in applications using large (>50GB) heaps containing many large objects.
+
+* Standard library
+* Standard library
+
+- Transparent Monotonic Time support
+- New bit manipulation package (math/bits)
+- Test Helper Functions
+- Concurrent Map (sync.Map)
+- Profiler Labels
+
+* Transparent Monotonic Time support
+
+NO MORE うるう秒 Effect!
+
+The time package now transparently tracks monotonic time in each Time value, making computing durations between two Time values a safe operation in the presence of wall clock adjustments.
+
+For example, this code always computes a positive elapsed time of approximately 20 milliseconds, even if the wall clock is changed during the operation being timed,
+
+  start := time.Now()
+  // ... operation that takes 20 milliseconds ...
+  t := time.Now()
+  elapsed := t.Sub(start)
+
+[[https://tip.golang.org/pkg/time/#hdr-Monotonic_Clocks][https://tip.golang.org/pkg/time/#hdr-Monotonic_Clocks]]
+
+* New bit manipulation package (math/bits)
+
+Go 1.9 includes a new package, math/bits, with optimized implementations for manipulating bits.
+
+Where implemented by SSA backends, the math/bits functions are replaced by a native sequence of instructions. When no specific instruction exists, or is not implemented, the compiler treats the math/bits package as normal Go code.
+
+* Test Helper Functions
+
+The new (*T).Helper and (*B).Helper methods mark the calling function as a test helper function. When printing file and line information, that function will be skipped. This permits writing test helper functions while still having useful line numbers for users.
+
+.code src/helper_test.go /START OMIT/,/END OMIT/
+
+* Concurrent Map (sync.Map)
+
+The new Map type in the sync package is a concurrent map with amortized-constant-time loads, stores, and deletes. It is safe for multiple goroutines to call a Map's methods concurrently.
+
+sync.Map is not a general purpose replacement for a sync.Mutex / RWMutex and the built in map type.
+
+[[https://github.com/gophercon/2017-talks/blob/master/lightningtalks/BryanCMills-AnOverviewOfSyncMap/An%20Overview%20of%20sync.Map.pdf][An Overview of sync.Map.pdf]]
+
+
+* And more
+
+[[https://tip.golang.org/doc/go1.9#minor_library_changes][Minor changes to the library]]
+
+
