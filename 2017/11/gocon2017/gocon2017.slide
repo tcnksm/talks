@@ -1,0 +1,363 @@
+Go+Microservices at Mercari
+Go Conference 2017 Autumn
+5 Nov 2017
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[http://deeeet.com][http://deeeet.com]]
+- SRE at Mercari, Inc.
+- Microservices platform & machine learning platform
+
+* Go 언어 실전 테크닉
+
+.image img/mingo.jpg 500 _
+
+.caption [[http://www.yes24.com/24/goods/44213105][22,000원]]
+
+* TL;DR
+
+How do we use Go (+gRPC) for microservices.
+
+* Microservices at Mercari
+
+Background
+
+- One large PHP monolith
+- Single repository for 3 regions (JP, US and UK)
+
+Challenges
+
+- Code is too huge/complex to understand -> unclear boundary/ownership
+- Team is too large to efficiently work on shared code base -> Velocity stalled
+
+* Microservices at Mercari
+
+Goal
+
+- More ownership to each team (You build it; you run it)
+- Faster development cycle and iteration
+- Appropriate language/software for each services
+
+See more [[https://www.slideshare.net//microservices-at-mercari][Micorservices at Mercari]] (Google Cloud INSIDE Games & Apps)
+
+* Microservices Architecture at Mercari US
+
+* Microservices Architecture at Mercari US
+
+API gateway pattern
+
+.image img/gateway.png 400 _
+
+.caption Mercari US architecture ref. [[https://azure.microsoft.com/en-us/blog/design-patterns-for-microservices/][Design patterns for microservices]]
+
+* Technical Stack
+
+- Docker for application packaging
+- Kubernetes (Google Container Engine) for container orchestration
+- *Go*, Python, Java for service language
+- *gRPC* for communication protocol
+
+* Go for Microservices
+
+* Go for Microservices
+
+- API gateway
+- Microservice itself
+
+* API gateway
+
+- Routing
+- Authentication & token validation
+- Protocol transformation
+- A/B testing (with Firebase Remote Config)
+- Request aggregation
+
+* Microservice itself
+
+Offer service, search service, personalization service and MORE in future.
+
+Frameworks?
+
+- [[https://github.com/go-kit/kit][https://github.com/go-kit/kit]]
+- [[https://github.com/micro/micro][https://github.com/micro/micro]]
+- [[https://github.com/NYTimes/gizmo][https://github.com/NYTimes/gizmo]]
+
+We don't use any framework. All you need is basic Go and gRPC knowledge to start new service.
+
+* How to implement new Go microservice?
+
+- Define protocol buffer definition (message and service interface)
+- Implement gRPC server by using auto-generated package
+- Implement handler for specific route for the service in API gateway
+
+We have a Go simple reference project which has basic/common logging & monitoring implementation, CI setting and so on. You can copy paste those and modify your own.
+            
+* gRPC for Microservices
+
+* What is gRPC?
+
+- gRPC Remote Procedure Call (*g* is not google)
+- High performance, general purpose, open source, standards-based, RPC framework
+- Open source version of stubby RPC in used in Google
+
+Feature
+
+- High performance & scale (HTTP/2 based transport)
+- Simple service definition (By default, gRPC uses protocol buffers)
+- Works across languages and platforms (e.g., Write golang server and  python client)
+
+Just define protobuf defition and generate client & server. You can focus on app logic itself
+
+* What is gRPC?
+
+Example echo service definition
+
+    service Echo {
+      rpc Say(SayRequest) returns (SayResponse) {};
+    }
+
+    message SayRequest {
+      string message_body = 1;
+    }
+
+    message SayResponse {
+      string message_body = 1;
+    }
+
+* Why not HTTP REST?
+
+- Who can implement REST *correctly*?
+- No more implementing HTTP client package for service X...
+- Performance ...
+- Bi-directional streaming ?
+
+* gRPC at Mercari
+
+[[https://speakerdeck.com/kazegusuri/go-conference-2016-spring][GRPCの実践と現状での利点欠点 / Go Conference 2016 Spring]] by [[https://twitter.com/kazegusuri?lang=en][@kazegusuri]]
+
+* Challenges 
+
+- Protocol buffer definition management
+- gRPC load balancing (on dynamic env)
+- gRPC monitoring (logging & tracing, metrics)
+
+* Protocol buffer definition management
+
+* Protocol buffer definition management
+
+All protobuf definitions are in one central repository
+
+- It's kinda works as central service documentation 
+
+Each language client & server (currently Go and PHP) package is in each repository
+
+- Automatically generated on CI
+- If you create a PR to change/add defition, corresponding clietnt&server package is also generated in each repository as PR (use dep to point that package while development)
+
+* gRPC load balancing (on dynamic env)
+
+* gRPC load balancing (on dynamic env)
+
+Dynamic environment is where instance/container IP is always changed (like kubernetes). *Correct* gRPC load balancing on such is kinda difficult and I could not find not so many good doc about this.
+
+*Correct* means
+
+- Each gRPC client request should round-robin each gRPC server
+- Zero downtime while deploying new gRPC server
+
+Don't forget "gRPC uses long-lived HTTP/2 connections"
+
+* gRPC load balancing (on dynamic env)
+
+If your LB supports gRPC load-balancing like Envoy, Skip this section.
+
+If not, like kubernetes service (it's `iptables`), you need [[https://github.com/grpc/grpc/blob/master/doc/load-balancing.md][client side LB]].
+
+.image img/grpc-lb1.png 200 _
+
+If you don't care anything on k8s, all calls from one client are routed only to single gRPC server (even if you have many). If you have another client, it *might* be routed to another backend instance. This is not load balancing...
+
+* gRPC load balancing (on dynamic env): Client side LB
+
+[[https://github.com/grpc/grpc-go/releases/tag/v1.6.0][grpc-go v1.6]] supports DNS resolver (until v1.6 we need to write our own...)
+
+    resolver, _ := naming.NewDNSResolverWithFreq(1 * time.Second)
+    balancer := grpc.RoundRobin(resolver)
+    conn, _ := grpc.DialContext(context.Background(), grpcHost, grpc.WithBalancer(balancer))
+
+.image img/grpc-lb3.png 200 _
+
+Then gRPC client resolves multiple server IPs and round-robin every calls (NOTE: on k8s, you need to use headless service).
+
+Be careful default resolve freq is 30 min! When on dynamic env, it must be much shorter.
+
+* (bonus) gRPC load balancing (on dynamic env)
+
+On k8s, another solution for gRPC LB is use service mesh software like [[https://linkerd.io/][Linkerd]] or [[https://istio.io/][Istio]] and ask side car pods to load balance.
+
+We, Mercari, are thinking to use Istio.
+
+* (bonus) gRPC deployment on k8s
+
+Be care to use rolling upgrade feature. Set appropriate interval so that the client can avoid to resolve old deaded server pods IP. If you don't care, client continues to call old pods and request losts.
+
+In Mercari, we use spinnaker and do Blue/Green deployment (and wait plenty of time until client resolves new pods IP).
+
+.image img/grpc-lb2.png 200 _
+
+* gRPC monitoring (logging, metrics & tracing)
+
+- We want to log all incoming/outgoing gRPC calls
+- We want to collect gRPC related metrics (how many x status? or latency?)
+- We want to trace gRPC call across the services
+
+How to write common/shared functions for gRPC client and server?
+
+* Common/shared functions (HTTP)
+
+Q. How do you implement common function for HTTP handlers?
+
+* Common/shared functions (HTTP)
+
+Q. How do you implement common function for HTTP handlers?
+
+A. Use middleware
+
+e.g, zap logging middleware
+
+  func withLog(logger *zap.Logger) adapter {
+    return func(next http.Handler) http.Handler {
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            start := time.Now()
+
+            d := newDelegator(w)
+            next.ServeHTTP(d, r)
+
+            logger.Info("request",
+                zap.String("path", r.URL.Path),
+                zap.Int("status", d.status),
+                zap.Duration("duration", time.Now().Sub(start)),
+                zap.String("method", r.Method),
+            )
+        })
+     }
+  }
+
+
+* Common/shared functions (gRPC)
+
+Q. When gRPC?
+
+A. Use Interceptors
+
+Interceptor is executed either on the gRPC Server before the request is passed onto the user's application logic, or on the gRPC client either around the user call.
+
+Unary server interceptor definition
+
+    type UnaryServerInterceptor func(ctx context.Context,
+                                     req interface{},
+                                     info *UnaryServerInfo,
+                                     handler UnaryHandler) (resp interface{}, err error)
+
+* Common/shared functions (gRPC)
+
+e.g., Unary server interceptor which sets request ID propagated via upstream server to `context.Value`.
+
+    func RequestIDUnaryServerInterceptor() grpc.UnaryServerInterceptor {
+        return func(ctx xContext.Context,
+                    req interface{},
+                    info *grpc.UnaryServerInfo,
+                    handler grpc.UnaryHandler) (interface{}, error) {
+            md, _ := metadata.FromIncomingContext(ctx)
+            if values, ok := md[grpcMetadataKey]; ok {
+                if len(values) > 0 {
+                    requestID := values[0]
+                    ctx = context.WithValue(ctx, contextKey{}, requestID)
+                }
+            }
+            return handler(ctx, req)
+        }
+    }
+
+Usage (pass it as `ServerOption`)
+
+    grpcServer := grpc.NewServer(grpc.UnaryInterceptor(RequestIDUnaryServerInterceptor()))
+
+* Common/shared functions (gRPC)
+
+[[https://github.com/grpc/grpc-go][grpc-go]] accepts only single interceptor...
+
+To apply multiple interceptors, use `WithUnaryServerChain` provided by [[https://github.com/grpc-ecosystem/go-grpc-middleware][go-grpc-middleware]] project.
+
+e.g., Unary server 
+
+    grpcServer := grpc.NewServer(grpc_middleware.WithUnaryServerChain(
+            interceptor1(),
+            interceptor2(),
+            interceptor3(),
+            ...,
+    ))
+
+* Common/shared functions (gRPC): Logging & metrics
+
+Not only chain function, go-grpc-middleware provides useful interceptors
+
+- [[https://github.com/grpc-ecosystem/go-grpc-middleware/tree/master/logging/zap][zap logging interceptor]]
+- [[https://github.com/grpc-ecosystem/go-grpc-prometheus][prometheus metrics interceptor]]
+
+
+    logger, _ := zap.NewProduction()
+    grpcServer := grpc.NewServer(grpc_middleware.WithUnaryServerChain(
+        grpc_zap.UnaryServerInterceptor(logger),
+        grpc_prometheus.UnaryServerInterceptor,
+        ...,
+    ))
+
+* Common/shared functions (gRPC): Distributed tracing
+
+Distributed tracing gives us insight which service makes the request slow?
+
+We use [[https://cloud.google.com/trace/][GCP stackdriver tracing]].
+
+[[https://github.com/GoogleCloudPlatform/google-cloud-go/tree/master/trace][Stackdriver tracing go client]] provides gRPC interceptor
+
+Client
+
+    traceClient, _ := trace.NewClient(ctx, projectID)
+    conn, _ := grpc.DialContext(ctx, target, grpc_middleware.ChainUnaryClient(
+        traceClient.GRPCClientInterceptor()
+        ...,
+    )
+
+Server
+
+    traceClient, _ := trace.NewClient(ctx, projectID)
+    grpcServer := grpc.NewServer(grpc_middleware.WithUnaryServerChain(
+        traceClient.GRPCServerInterceptor(),
+        ...,
+    ))    
+
+* Distributed tracing for gRPC
+
+.image img/trace.png 500 _
+
+.caption Tracing view on Stackdriver UI
+
+* Microservices at Mercari JP?
+
+* Microservices at Mercari JP?
+
+- Some of ML services are deployed as microservices on GKE
+- Now implementing new API gateway for JP (and UK) <- I'm gonna talk about this implementation in next GoCon 2018
+
+* We're hiring
+
+- Server side engineer writes a high performance microservice in Go
+- SRE works on microservice platform (Go, k8s & Cloud Native software knowledges)
+- SRE works on ML platform (Go, Python, k8s & GPU knowledges)
