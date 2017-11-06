@@ -139,7 +139,7 @@ Example echo service definition
 
 * gRPC at Mercari
 
-[[https://speakerdeck.com/kazegusuri/go-conference-2016-spring][GRPCの実践と現状での利点欠点 / Go Conference 2016 Spring]] by [[https://twitter.com/kazegusuri?lang=en][@kazegusuri]]
+[[https://speakerdeck.com/kazegusuri/grpc-and-rest-with-grpc-in-practice][gRPC and REST with gRPC in practice]] by [[https://twitter.com/kazegusuri?lang=en][@kazegusuri]]
 
 * Challenges 
 
