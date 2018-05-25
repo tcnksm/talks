@@ -1,0 +1,125 @@
+今学ぶべき技術 by deeeet
+会津春の大LT大会
+26 May 2018
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[https://deeeet.com][https://deeeet.com]]
+- Tech lead at Mercari microservices platform team ([[https://open.talentio.com/1/c/mercari/requisitions/detail/7877][We're hiring!]])
+
+* 今学ぶべき技術
+
+* 今学ぶべき技術
+
+英語
+
+* 英語かよ！引っ込め👎
+
+- 学ぶべき技術は何かを知るには「英語」が必要
+- 技術を深く学ぶには「英語」が必要
+
+* 英語で学ぶべき技術を知る
+
+* そもそも
+
+何を学ぶべきかは自分で知る必要がある
+
+- 学ぶべき技術は個人の趣向によって異なる
+- 学ぶべき技術は所属する組織や環境によって異なる
+- 学ぶべき技術は立場によって異なる
+
+* 英語で日々の情報収集をする
+
+多くの技術トレンドやプラクティスは英語圏から現れる
+
+- 日本語で取れる情報は一部でしかない
+- 日本語で紹介される情報は「紹介する人の」趣向が反映される
+
+自分のコンテキストに沿った必要な情報を英語で取りに行き学ぶべき技術を自分で知る
+
+* 例1（Microservices）
+
+背景：MercariではMonolithアーキテクチャから[[https://speakerdeck.com/tcnksm/microservices-on-gke-at-mercari][Microservicesアーキテクチャへの移行]]を進めている．Microservicesの意義や思想に関する情報は多いが実際にMicroservices化を進める上で出てくる課題とその解法に関してはまだ情報は少ない
+
+日々の情報収集：
+
+- 海外ではMicroservicesが当たり前になっているなあ
+- Microservices化を実践する企業は似たような課題を抱えているなあ
+- [[https://deeeet.com/writing/2018/05/22/service-mesh/][Service mesh]]という考え方が登場しそれにより多くの課題を解決できるらしい
+- Service meshの代表的なプロダクトとして[[https://istio.io/][Istio]]があり多くの企業が実践投入しようとしているらしいぞ！
+
+学ぶべき技術：*Istio*
+
+* 例2（機械学習）
+
+背景：機械学習を使ったサービスはMercariにおいて重要なプロダクトとなった．機械学習のモデルの作り方のプラクティスは広く存在するが，そのモデルのServingやモデルをの学習のためのインフラの構築のプラクティスはまだまだ少ない！
+
+日々の情報収集：
+
+- GoogleやUberは機械学習のための基盤を作っているらしい
+- 機械学習のためのインフラを支える[[http://www.sysml.cc/][SysML]]という職種が登場したらしい
+- 機械学習も[[https://kubernetes.io/][Kubernetes]]で動かしてるところが増えているが課題も多そう
+- [[https://github.com/kubeflow/kubeflow][Kubeflow]]というKubernetes上での機械学習のデプロイを容易にするツールが登場してコミュニティがとにかく成長しているらしいぞ！
+
+学ぶべき技術：*Kubeflow*
+
+（ちなみにMercariでもKubenetesをつかった[[https://speakerdeck.com/hnakagawa/merukarifalsemaketutojian-quan-hua-shi-ce-wozhi-erumlji-pan][機械学習の基盤]]を作り始めている）
+
+* 英語の技術Podcastも重要な情報源
+
+通勤・通学中に聴ける！Rebuildだけじゃない！
+
+- [[https://changelog.com/gotime][GO TIME]] - その時話題のGo OSSの開発者が登場して深掘りしてくれる（Rob Pike, Russ Cox, Dave CheneyといったGo界の重鎮も登場！）
+- [[https://kubernetespodcast.com/][Kubernetes Podcas]] - Kubernetes界隈のニュースを紹介したり重要なトピックに関してはそれに関わる開発者が登場して深掘りしてくれる
+- [[https://www.gcppodcast.com/][Google Cloud Platform Podcast ]] - GCPの最新のサービスを紹介したり各プロダクトのエンジニアやPMが登場して深掘りしてくれる
+
+* 英語で技術を学ぶ
+
+* 技術を学ぶ
+
+公式ドキュメント（英語!）だけで理解できるなら十分だが書籍を読むのも大切
+
+- より体系的に深くその技術や背後にある思想について理解する
+- （企業や個人の）プラクティスを知る
+
+* 英語の技術書を読む
+
+- 日本語と比べて書籍の量が圧倒的に多い
+- 量が多いからこそ良質な本も多い
+- 翻訳を待ってられない（翻訳されないかもしれない）
+
+* 翻訳に気をつける
+
+技術書を読む最終的なゴールは公式ドキュメントや関連文章を読めるようになること．翻訳に頼り過ぎるとその分野の重要な「語彙」を失う（もちろん素晴らしい翻訳本はたくさんある!）
+
+* 例1（Computer Scienceの基礎）
+
+古典的な基礎分野の書籍は日本語の書籍が多いからそれを読めば良いと思ってる人は多いかもしれないが英語の書籍に目を向けるとわかりやすい本は多く存在する．
+
+- [[https://deeeet.com/writing/2017/01/12/go-interpreter/][Writing An Interpreter In Goを読んだ]]（コンパイラの基礎） - Goを使って実際にInterpreterを実装しながらコンパイラの基礎を0から学べる本．コンパイラ初心者でもGoさえ知っていれば読める．日本語だとDrangon bookのような1000ページを超える重圧な本しかコンパイラの本がない（そもそも英語でもなかった）...
+- [[https://deeeet.com/writing/2016/11/07/systems-performance/][Systems Performanceを読んだ]]（KernelとOSの基礎）- Linuxパフォーマンスの第一人者がパフォーマンスと言う観点でCPUやメモリといったハードウェアからKernelやOSまでを詳細に解説した本．パフォーマンスを目的としているため自分の業務に置き換えて読める．日本語だとO'Reillyの「Linuxシステムプログラミング」や「詳解Linuxカーネル」といった辞書的な本しかない...
+
+* 例2（最先端の技術）
+
+そもそも新しい技術の日本語の書籍は翻訳されない限りない．英語だとそのツールやソフトウェアの開発者自身が書籍を書いていることが多い！
+
+- [[https://www.spinnaker.io/ebook/][Continuous Delivery With Spinnaker]] - Netflixの大規模Microservicesを支えるContinuous Delivery SystemであるSpinnakerについての本．それだけでなくCloudで大規模なデプロイを行なっているNetflixならではの知見やプラクティスがかなり詰まっている
+- [[https://developers.redhat.com/books/introducing-istio-service-mesh-microservices/][Introducing Istio Service Mesh for Microservices]] - 先程紹介したIstioについてその背景から何ができるのかまでを具体的なアプリケーションを使い紹介した本．
+- [[http://shop.oreilly.com/product/0636920063964.do][Seeking SRE]] - SREについてGoogle社内のプラクティスを集めた本（[[https://landing.google.com/sre/book.html][Site Reliability Engineering]]）は有名だがこちらは他社（SoundCloudやStripeやLyft）の事例を集めた本．
+
+* Safari Books Online
+
+[[https://www.safaribooksonline.com/][https://www.safaribooksonline.com/]]
+
+$39/月もしくは$399/年でEarly Releaseを含めたOreillyの全書籍を読めるようになる！
+
+* まとめ
+
+- 英語を使うことで今学ぶべき技術が何かを掴めるようになる
+- 英語を使うことで今学ぶべき技術をより深く理解できるようになる
