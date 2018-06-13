@@ -1,0 +1,149 @@
+API GatewayによるMicroservices化
+Fukuoka.go#11
+14 Jun 2018
+
+Taichi Nakashima
+@deeeet
+
+* About me
+
+.image img/deeeet.png 200 _
+
+- *@deeeet* / *@tcnksm* (GitHub)
+- [[https://deeeet.com][deeeet.com]]
+- Tech lead at [[https://open.talentio.com/1/c/mercari/requisitions/detail/7877][Mercari microservices platform team]]
+
+* Background
+
+- ビジネス及びサービス成長にともない組織も拡大してきた
+- Monolithアーキテクチャによる開発が限界に達してきた
+
+Microservicesアーキテクチャへの移行により組織+技術的な課題を解決する
+
+* API gateway?
+
+MicroservicesアーキテクチャにおけるAPI Gatewayの役割
+
+- クライアントからのリクエストを*単一のEndpoint*で受けRoutingを行う
+- MonolithへのリクエストをProxyし段階的なサービス分割を補助する
+- 各Microservicesが持つべき共通処理をOffloadする
+
+共通処理
+
+- SSL termination
+- DDoS protection
+- AuthN/AuthZ
+- Observability
+
+* API gateway?
+
+.image img/api-gateway.png 500 _
+
+* API gateway for Mercari?
+
+MercariのAPI gatewayが満たすべきこと
+
+- Mercariの全リクエストを捌く（ピーク時約56,000req/sec）
+- 内製のAuthorityサービスと連携する
+- クライアントがProtocol bufferを利用する
+- DC内部のMicroservices間の通信にgRPCを利用する
+- 日本だけではなく他のRegionや他のサービスでも利用できるようにする
+- (Kubernetes上で動く)
+
+* VS.
+
+以下の利用を検討した
+
+- [[https://www.nginx.com/][Nginx]]
+- [[https://envoyproxy.github.io/][Envoy]]
+- [[https://istio.io/docs/tasks/traffic-management/ingress/][Istio ingress]]
+- [[https://traefik.io/][Traefik]]
+- [[https://github.com/Mashape/kong][Kong]]
+- [[https://www.getambassador.io/][Ambassador]]
+- [[https://github.com/fabiolb/fabio][fabio]]
+- [[https://github.com/micro/micro][micro]]
+- [[https://github.com/devopsfaith/krakend][krakend]]
+
+* Implementation
+
+* Technical stack
+
+- [[https://cloud.google.com/load-balancing/][Google Load Balancer (GLB)]]
+- Go
+
+[[https://deeeet.com/writing/2018/05/22/service-mesh/][Service mesh]]の将来的な導入を考慮しできる限りNginxなどの依存を減らした
+
+* Google Load Balancer (GLB)
+
+以下を担う部分として利用
+
+- SSL termination
+- DDoS protection
+
+将来的には[[https://cloud.google.com/armor/][Cloud Armor]]を利用したセキュリティの強化も検討している
+
+* Go
+
+以下の機能を実装
+
+- Proxy
+- Routing
+- Load balancing
+- Canary rollout
+- Protocol transformation (HTTP to gRPC)
+- Observability
+- DNS cache
+- Request buffering
+
+なおServive DiscoveryはKubernetesのDNSが担ってくれている++
+
+* Design
+
+- Core as a package
+- Middleware driven
+
+* Core as package
+
+.image img/api-gateway-package.png 300 _
+
+- Core packageをもとにRegionごと他のサービスごとの実装を行うことができる
+- Core packageには共通処理やパフォーマンスに必要な機能を持たせる
+- Core packageを使う側にRegionやサービス特有の処理を持たせる
+
+Core packageはSREやSecurity Engineerが，それを使った実装はDeveloperが責任をもつ
+
+* Middleware driven
+
+ベースには`net/http`パッケージを使い，各Microservicesへのリクエストの実行はDeveloperの定義を基に生成したHandlerで行う．
+
+そのHandlerへの共通処理の実装に[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）を用いる．
+
+.code src/middleware.go /^func with/,/^}/
+
+* Middleware driven
+
+Middleware（Adapter）を書くだけで共通処理をどんどん増やしていける．Coreは以下のようなAdapterをもつ
+
+- `withAuth` - 内製のAuthorityサービスによる認証
+- `withRequestBuffering` - リクエストのBuffering
+- `withLog` - アクセスログの記録
+- `withDDInstruments` - [[https://www.datadoghq.com/][Datadog]]へのメトリクスの送信
+- `withDDTrace` - [[https://www.datadoghq.com/][Datadog]]による分散TracingのSpanの生成
+- `withRecover` - panicのrecover+[[https://sentry.io][Sentry]]への通知
+
+カスタムのAdapterも外部から渡せるように実装している
+
+* Implementation details
+
+* Implementation details
+
+- Protocol transformation (HTTP to gRPC)
+
+
+* 参考
+
+- [[https://www.slideshare.net/GoogleCloudPlatformJP/microservices-at-mercari][Microservices at Mercari]]
+- [[https://speakerdeck.com/tcnksm/microservices-on-gke-at-mercari][Microservices on GKE at Mercari]]
+- [[https://docs.microsoft.com/en-us/azure/architecture/patterns/gateway-routing][Gateway Routing pattern]]
+- [[https://docs.microsoft.com/en-us/azure/architecture/patterns/gateway-offloading][Gateway Offloading pattern]]
+
