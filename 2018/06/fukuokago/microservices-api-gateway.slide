@@ -13,6 +13,12 @@ Taichi Nakashima
 - [[https://deeeet.com][deeeet.com]]
 - Tech lead at [[https://open.talentio.com/1/c/mercari/requisitions/detail/7877][Mercari microservices platform team]]
 
+* tl;dr
+
+- API Gatewayとは何か?
+- API Gatewayの実装思想は?
+- API Gatewayの詳細実装は?
+
 * Background
 
 - ビジネス及びサービス成長にともない組織も拡大してきた
@@ -45,7 +51,7 @@ MercariのAPI gatewayが満たすべきこと
 
 - Mercariの全リクエストを捌く（ピーク時約56,000req/sec）
 - 内製のAuthorityサービスと連携する
-- クライアントがProtocol bufferを利用する
+- ClientがProtocol bufferを利用する
 - DC内部のMicroservices間の通信にgRPCを利用する
 - 日本だけではなく他のRegionや他のサービスでも利用できるようにする
 - (Kubernetes上で動く)
@@ -63,6 +69,14 @@ MercariのAPI gatewayが満たすべきこと
 - [[https://github.com/fabiolb/fabio][fabio]]
 - [[https://github.com/micro/micro][micro]]
 - [[https://github.com/devopsfaith/krakend][krakend]]
+
+* VS.
+
+- どれもやりたいこと全てを満たせない
+- LuaやC++ではなくMercari Engineerが使える言語で今後の拡張したい
+- 内製サービス（e.g., Authority Service）と連携したい
+
+Goを使って内製することに!
 
 * Implementation
 
@@ -95,14 +109,25 @@ MercariのAPI gatewayが満たすべきこと
 - DNS cache
 - Request buffering
 
-なおServive DiscoveryはKubernetesのDNSが担ってくれている++
+Servive DiscoveryはKubernetesのDNSが担ってくれている++
 
 * Design
 
+- Gopher friendly
 - Core as a package
 - Middleware driven
 
-* Core as package
+* Gopher friendly
+
+* Gopher friendly
+
+（そもそも）API Gatewayは今後Mercari Engineerがどんどん使っていく．MercariでメインになっていくGoさえ知っていれば誰でもコントリビュートできるようにしたい．
+
+なるべく標準ライブラリや標準の作法を組み合わせて実装する．
+
+* Core as a package
+
+* Core as a package
 
 .image img/api-gateway-package.png 300 _
 
@@ -114,9 +139,11 @@ Core packageはSREやSecurity Engineerが，それを使った実装はDeveloper
 
 * Middleware driven
 
-ベースには`net/http`パッケージを使い，各Microservicesへのリクエストの実行はDeveloperの定義を基に生成したHandlerで行う．
+* Middleware driven
 
-そのHandlerへの共通処理の実装に[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）を用いる．
+ベースには`net/http`パッケージを使う．各MicroservicesへのリクエストのハンドリングはDeveloperの定義を基に`http.Handler`を生成することで行う．
+
+その`http.Handler`への共通処理の実装に[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）を用いる．
 
 .code src/middleware.go /^func with/,/^}/
 
@@ -124,21 +151,116 @@ Core packageはSREやSecurity Engineerが，それを使った実装はDeveloper
 
 Middleware（Adapter）を書くだけで共通処理をどんどん増やしていける．Coreは以下のようなAdapterをもつ
 
-- `withAuth` - 内製のAuthorityサービスによる認証
+- `withAuth` - 内製のAuthorityサービスによるAuthN/AuthZ
 - `withRequestBuffering` - リクエストのBuffering
-- `withLog` - アクセスログの記録
-- `withDDInstruments` - [[https://www.datadoghq.com/][Datadog]]へのメトリクスの送信
-- `withDDTrace` - [[https://www.datadoghq.com/][Datadog]]による分散TracingのSpanの生成
 - `withRecover` - panicのrecover+[[https://sentry.io][Sentry]]への通知
+- `withLog` - アクセスログの記録 (Observability)
+- `withDDInstruments` - [[https://www.datadoghq.com/][Datadog]]へのメトリクスの送信 (Observability)
+- `withDDTrace` - [[https://www.datadoghq.com/][Datadog]]による分散TracingのSpanの生成 (Observability)
 
 カスタムのAdapterも外部から渡せるように実装している
 
+* Other solution: DigitalOcean API gateway
+
+[[https://mauricio.github.io/golang-proxies/#/][Building a proxy server in Golang]]
+
+.code src/digitalocean.go /START OMIT/,/END OMIT/
+
 * Implementation details
 
 * Implementation details
+
+以下の代表的な機能の実装の詳細を紹介する
 
 - Protocol transformation (HTTP to gRPC)
+- Request buffering
 
+* Protocol transformation
+
+* Protocol transformation
+
+.image img/protocol-tranformation.png 150 _
+
+やりたいこと
+
+- Client（iOS，Androind）からAPI GatewayはProtocol buffer over HTTPを使う
+- DC内部の通信は全てgRPCを使う
+
+API Gatewayがprotocolの変換（HTTP to gRPC）を担う
+
+* Protocol transformation
+
+なぜProtocol buffer over HTTP?
+
+- ClientでのMessageのValidationコストを下げる
+- インターネット上でのgRPCの利用はまだ若干の懸念がありHTTP(S)を利用する
+
+なぜgRPC (vs. REST)?
+
+- パフォーマンス
+- インターフェースのデザインのコスト
+- インターフェースの統一化のしやすさ
+
+* Protocol transformation
+
+開発者がやること
+
+- サービスのインターフェースをProtocol bufferで定義する
+- エンドポイントの定義をGatewayの実装に追加する（以下）
+
+.code src/gateway-definition.go /START OMIT/,/END OMIT/
+
+開発者が実装するべき部分は最小限に（パフォーマンスに関わる部分は隠蔽）！
+
+将来的にはprotoc pluginで完全自動化し何も書かなくても良くしたい
+
+* Protocol transformation
+
+Core packageは前述の定義を基に`http.Handler`を生成する．
+
+（省略版）
+
+.code src/protocol-tranformation.go /^func /,/^}/
+
+HTTP RequestとしてProtoを受け与えられたStructにUnmarshalする．
+
+gRPC Requestを投げそのResponseをProtoにMarshalしてHTTP Responseを返す．
+
+* Protocol transformation
+
+他の機能
+
+- gRPC error code とHTTP Status codeの変換（ref [[https://github.com/grpc-ecosystem/grpc-gateway][grpc-gateway]]）
+- Request Headerを基にJSONでのリクエストも受け付けるように by [[https://godoc.org/github.com/golang/protobuf/jsonpb][jsonpb]]
+- GoogleのAPI Designの[[https://cloud.google.com/apis/design/errors][Error]]を参考にした共通のエラーメッセージの定義
+
+* Request buffering
+
+* Request buffering
+
+GLBやGo標準の[[https://golang.org/pkg/net/http/httputil/][ReverseProxy]]はRequest bufferingをしない（Nginxなどはdefaultでbufferingする）つまりRequestはサーバーに到達した瞬間にBackendに送られる．
+
+インターネット越しのClientからAPI gatewayのリクエストは通信環境によって遅くなることは十分に起こりうる．API gatewayにRequest bufferingを持たせることで配下のMicroservicesがSlow Clientのことを考慮する必要がなくなる．Slow clientの問題かAPI gatewayとMicroservices間の問題かの切り分けも容易になる．
+
+* Request buffering
+
+[[https://github.com/vulcand/oxy][vulcand/oxy]]をforkして実装した．
+
+Forkした理由はGoの[[https://golang.org/pkg/net/http/httputil/][ReverseProxy]]とうまく動かないため（ReverseProxyがTransfer-EncodingとContent-Lengthヘッダーを消すのでoxyがResponse bodyを読めない...）
+
+動作
+
+- 基本はIn-memoryのBuffferにリクエストを保存
+- 一定値を超えたらFileに書き出す（GKEでSSD準備する努力とかもあったが...）
+- 全リクエストが到達したらBackendにリクエストを送りつける
+
+以上をMiddleware（Adapter）として実装した
+
+* まとめ
+
+話したりねえ！
+
+続きは[[https://mercari.connpass.com/event/91306/][mercari.go#1]]で
 
 * 参考
 
@@ -146,4 +268,5 @@ Middleware（Adapter）を書くだけで共通処理をどんどん増やして
 - [[https://speakerdeck.com/tcnksm/microservices-on-gke-at-mercari][Microservices on GKE at Mercari]]
 - [[https://docs.microsoft.com/en-us/azure/architecture/patterns/gateway-routing][Gateway Routing pattern]]
 - [[https://docs.microsoft.com/en-us/azure/architecture/patterns/gateway-offloading][Gateway Offloading pattern]]
-
+- [[https://www.digitalocean.com/community/tutorials/understanding-nginx-http-proxying-load-balancing-buffering-and-caching][Understanding Nginx HTTP Proxying, Load Balancing, Buffering, and Caching]]
+- [[https://mauricio.github.io/golang-proxies/#/][Building a proxy server in Golang]]
