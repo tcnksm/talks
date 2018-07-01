@@ -6,17 +6,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-func GRPCHandler(fullName string, conn *grpc.ClientConn, req, resp proto.Message) http.Handler {
+func GRPCHandler(name string, conn *grpc.ClientConn, reqMsg, respMsg proto.Message) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		unmarshalRequest(r, req)
+		unmarshalRequest(r, reqMsg) // リクエストを与えられたリクエストにUnmarshalする
 
-		conn.Invoke(r.Context(),
-			fullName, req, resp,
-			grpc.FailFast(false),
-		)
+		conn.Invoke(r.Context(), name, reqMsg, respMsg) // gRPCリクエストを実行する
 
-		buf, _ := proto.Marshal(resp)
-		w.Write(buf)
+		buf, _ := proto.Marshal(respMsg) // 与えられたレスポンスにMarshalする
+
+		w.Write(buf) // HTTPレスポンスを書き込む
 	})
 }
 

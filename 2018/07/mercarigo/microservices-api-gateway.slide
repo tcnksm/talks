@@ -1,6 +1,6 @@
 API GatewayによるMicroservices化
-Fukuoka.go#11
-14 Jun 2018
+mercari.go#1
+3 Jul 2018
 
 Taichi Nakashima
 @deeeet
@@ -10,10 +10,19 @@ Taichi Nakashima
 .image img/deeeet.png 200 _
 
 - *@deeeet* / *@tcnksm* (GitHub)
-- [[https://deeeet.com][deeeet.com]]
+- Blog on [[https://deeeet.com][deeeet.com]]
 - Tech lead at [[https://open.talentio.com/1/c/mercari/requisitions/detail/7877][Mercari microservices platform team]]
 
+* Mercari Meetup for Microservices Platform 7/19
+
+遊びに来てくれ！
+
+.image img/meetup-logo.png 350 _
+.caption [[https://mercari.connpass.com/event/92168/][https://mercari.connpass.com/event/92168/]]
+
 * tl;dr
+
+Mercariの全リクエストを受けるMicroservicesのためのAPI Gatewayについて紹介する
 
 - API Gatewayとは何か?
 - API Gatewayの実装思想は?
@@ -21,40 +30,47 @@ Taichi Nakashima
 
 * Background
 
-- ビジネス及びサービス成長にともない組織も拡大してきた
-- Monolithアーキテクチャによる開発が限界に達してきた
+- サービスの成長に伴う組織の拡大
+- Monolithの巨大化と複雑化
 
-Microservicesアーキテクチャへの移行により組織+技術的な課題を解決する
+Microservicesアーキテクチャへの移行によりスケーラブルな開発組織を目指す！
 
-* API gateway?
-
-MicroservicesアーキテクチャにおけるAPI Gatewayの役割
-
-- クライアントからのリクエストを*単一のEndpoint*で受けRoutingを行う
-- MonolithへのリクエストをProxyし段階的なサービス分割を補助する
-- 各Microservicesが持つべき共通処理をOffloadする
-
-共通処理
-
-- SSL termination
-- DDoS protection
-- AuthN/AuthZ
-- Observability
-
-* API gateway?
+* API gateway for Microservices?
 
 .image img/api-gateway.png 500 _
 
-* API gateway for Mercari?
+* API gateway for Microservices?
+
+MicroservicesアーキテクチャにおけるAPI Gatewayの役割
+
+- クライアントからのリクエストを単一のEndpointで受けRoutingを行う
+- （Internet facingの）各Microservicesが持つべき共通処理(*)をOffloadする
+- MonolithへのリクエストをProxyし段階的なサービス分割を補助する
+
+(*)共通処理
+
+- SSL termination
+- DDoS protection
+- Request buffering
+- AuthN/AuthZ
+- Observability
+
+# クライアントから見ると1つのAPIにリクエストを投げているように見える．新規にサービスを分割してもクライアントの変更は必要なくGatewayのRoutingを変更するだけでよくなる
+
+* API gateway for Microservices?
+
+MonolithへのリクエストをProxyし段階的なサービス分割を補助する
+
+.image img/gateway-routing.png 500 _
+
+* API gateway for *Mercari* Microservices?
 
 MercariのAPI gatewayが満たすべきこと
 
-- Mercariの全リクエストを捌く（ピーク時約56,000req/sec）
-- 内製のAuthorityサービスと連携する
-- ClientがProtocol bufferを利用する
-- DC内部のMicroservices間の通信にgRPCを利用する
+- High performance（ピーク時約56,000req/sec）
+- 内製サービス（e.g., Authentication service）と連携する
+- Microservices間の通信にgRPCを利用する（Protocol transformation）
 - 日本だけではなく他のRegionや他のサービスでも利用できるようにする
-- (Kubernetes上で動く)
 
 * VS.
 
@@ -72,11 +88,10 @@ MercariのAPI gatewayが満たすべきこと
 
 * VS.
 
-- どれもやりたいこと全てを満たせない
-- LuaやC++ではなくMercari Engineerが使える言語で今後の拡張したい
-- 内製サービス（e.g., Authority Service）と連携したい
+- やりたいこと全て満たすのが難しい（e.g.,内製サービスとの連携）
+- LuaやC++ではなくMercari Engineerが誰でも使える言語で拡張したい
 
-Goを使って内製することに!
+内製することに!
 
 * Implementation
 
@@ -85,22 +100,23 @@ Goを使って内製することに!
 - [[https://cloud.google.com/load-balancing/][Google Load Balancer (GLB)]]
 - Go
 
-[[https://deeeet.com/writing/2018/05/22/service-mesh/][Service mesh]]の将来的な導入を考慮しできる限りNginxなどの依存を減らした
-
 * Google Load Balancer (GLB)
+
+*Why?*（そもそも）Microservicesの基盤はCloud（GCP）上に構築してる．CloudサービスでできることはCloudサービスでやる（詳しくは[[https://speakerdeck.com/tcnksm/microservices-on-gke-at-mercari][Microservices on GKE at Mercari]]）
 
 以下を担う部分として利用
 
 - SSL termination
 - DDoS protection
 
-将来的には[[https://cloud.google.com/armor/][Cloud Armor]]を利用したセキュリティの強化も検討している
++将来的には[[https://cloud.google.com/armor/][Cloud Armor]]を利用したセキュリティの強化も検討している
 
 * Go
 
+*Why?* Goは今後Mercariのメインの言語になっていく．Goさえ知っていれば誰でもAPI gatewayを拡張できるようにしたい
+
 以下の機能を実装
 
-- Proxy
 - Routing
 - Load balancing
 - Canary rollout
@@ -108,63 +124,89 @@ Goを使って内製することに!
 - Observability
 - DNS cache
 - Request buffering
+- ...
 
-Servive DiscoveryはKubernetesのDNSが担ってくれている++
+* Only Go
+
+[[https://deeeet.com/writing/2018/05/22/service-mesh/][Service mesh]]（Istio）の将来的な導入を検討していたためNgnixなどの依存は極力減らした
 
 * Design
 
 - Gopher friendly
 - Core as a package
+- Excluding business logic
 - Middleware driven
 
 * Gopher friendly
 
 * Gopher friendly
 
-（そもそも）API Gatewayは今後Mercari Engineerがどんどん使っていく．MercariでメインになっていくGoさえ知っていれば誰でもコントリビュートできるようにしたい．
+「Goさえ知っていれば誰でもAPI Gatewayを拡張できる」
 
-なるべく標準ライブラリや標準の作法を組み合わせて実装する．
+なるべく標準ライブラリや標準の作法を組み合わせて実装する．例えばサーバー実装は`net/http`のみを使う，テストは`testing`でTable drivenを使う，Middlewareパターン（後述）を使うなど
+
+* Gopher friendly
+
+某有名なスーパーGoハッカーの声
+
+.image img/tweet.jpg 200 _
 
 * Core as a package
 
 * Core as a package
+
+Core packageとそれを使った具体的な実装に分離した
+
+- Regionや他サービスごとの実装を可能にするため
+- 実装の責任範囲を明確に分離するため
+
+* Core as a package
+
+Regionや他サービスごとの実装を可能にする．
 
 .image img/api-gateway-package.png 300 _
 
-- Core packageをもとにRegionごと他のサービスごとの実装を行うことができる
-- Core packageには共通処理やパフォーマンスに必要な機能を持たせる
-- Core packageを使う側にRegionやサービス特有の処理を持たせる
+* Core as a package
 
-Core packageはSREやSecurity Engineerが，それを使った実装はDeveloperが責任をもつ
+実装の責任範囲を明確に分離する．
+
+Core packageはSREが，それを使った実装はDeveloperが責任をもつ．
+
+- SREはCore packageに共通処理やパフォーマンスに必要な機能を実装する（Internet facingの扱いはSREの専門的な知識が必要）
+- DeveloperはCore packageを使いサービス特有の機能を実装する
+
+* Excluding business logic
+
+* Excluding business logic
+
+API GatewayにBusiness logicを実装できると第2のMonolithになりかねない．
+
+Core packageを使った実装には最小限のことしかできないようにしている．
 
 * Middleware driven
 
 * Middleware driven
 
-ベースには`net/http`パッケージを使う．各MicroservicesへのリクエストのハンドリングはDeveloperの定義を基に`http.Handler`を生成することで行う．
+Gatewayでの共通処理は全て[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）で実装している
 
-その`http.Handler`への共通処理の実装に[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）を用いる．
+e.g., アクセスログを記録するMiddleware
 
 .code src/middleware.go /^func with/,/^}/
 
+Middlewareを書くだけでどんどん機能を拡張していける．
+
 * Middleware driven
 
-Middleware（Adapter）を書くだけで共通処理をどんどん増やしていける．Coreは以下のようなAdapterをもつ
+Coreは以下のようなMiddlewareをもつ
 
 - `withAuth` - 内製のAuthorityサービスによるAuthN/AuthZ
 - `withRequestBuffering` - リクエストのBuffering
-- `withRecover` - panicのrecover+[[https://sentry.io][Sentry]]への通知
 - `withLog` - アクセスログの記録 (Observability)
 - `withDDInstruments` - [[https://www.datadoghq.com/][Datadog]]へのメトリクスの送信 (Observability)
 - `withDDTrace` - [[https://www.datadoghq.com/][Datadog]]による分散TracingのSpanの生成 (Observability)
+- `withRecover` - panicのrecover+[[https://sentry.io][Sentry]]への通知
 
-カスタムのAdapterも外部から渡せるように実装している
-
-* Other solution: DigitalOcean API gateway
-
-[[https://mauricio.github.io/golang-proxies/#/][Building a proxy server in Golang]]
-
-.code src/digitalocean.go /START OMIT/,/END OMIT/
+Regionやサービス特有の機能を実装して使うこともできる．
 
 * Implementation details
 
@@ -173,7 +215,6 @@ Middleware（Adapter）を書くだけで共通処理をどんどん増やして
 以下の代表的な機能の実装の詳細を紹介する
 
 - Protocol transformation (HTTP to gRPC)
-- Request buffering
 
 * Protocol transformation
 
@@ -183,84 +224,94 @@ Middleware（Adapter）を書くだけで共通処理をどんどん増やして
 
 やりたいこと
 
-- Client（iOS，Androind）からAPI GatewayはProtocol buffer over HTTPを使う
+- Client（iOS，Androind）からAPI GatewayまではProtocol buffer over HTTPを使う
 - DC内部の通信は全てgRPCを使う
 
 API Gatewayがprotocolの変換（HTTP to gRPC）を担う
 
 * Protocol transformation
 
-なぜProtocol buffer over HTTP?
+なぜClientでProtocol buffer（vs. JSON）?
 
-- ClientでのMessageのValidationコストを下げる
-- インターネット上でのgRPCの利用はまだ若干の懸念がありHTTP(S)を利用する
+- ClientでのMessageのValidationコストを下げたい
 
-なぜgRPC (vs. REST)?
+なぜインターネット上はover HTTP?
+
+- インターネット上でのgRPCの利用事例が少なくまだ懸念があった
+
+なぜDC内部はgRPC（vs. REST）?
 
 - パフォーマンス
-- インターフェースのデザインのコスト
-- インターフェースの統一化のしやすさ
+- Microservicesのインターフェースのデザインのコスト
+- Microservices間のインターフェース定義の統一化
 
 * Protocol transformation
 
 開発者がやること
 
 - サービスのインターフェースをProtocol bufferで定義する
-- エンドポイントの定義をGatewayの実装に追加する（以下）
-
-.code src/gateway-definition.go /START OMIT/,/END OMIT/
-
-開発者が実装するべき部分は最小限に（パフォーマンスに関わる部分は隠蔽）！
-
-将来的にはprotoc pluginで完全自動化し何も書かなくても良くしたい
+- エンドポイントの定義をGatewayの実装に追加する
 
 * Protocol transformation
 
-Core packageは前述の定義を基に`http.Handler`を生成する．
+サービスのインターフェースをProtocol bufferで定義する（e.g., Echo service）
+
+    service Echo {
+       rpc Say(SayRequest) returns (SayResponse) {};
+    }
+
+    message SayRequest {
+       string message_body = 1;
+    }
+
+    message SayResponse {
+       string message_body = 1;
+    }
+
+Protoの定義から各言語のClientとServerの実装を生成する．
+
+* Protocol transformation
+
+エンドポイントの定義をGatewayの実装に追加する（e.g., Echo service）
+
+.code src/gateway-definition.go /START OMIT/,/END OMIT/
+
+以下のことができるようになる．
+
+- Clientは`/services/echo/say`に`SayRequest`をHTTPで投げる
+- Gatewayは`SayRequest`を`Say`メソッドでgRPCでEcho serviceに投げる
+- GatewayはEcho serviceから`SayResponse`を受けそれをClientにHTTPで返す
+
+* Protocol transformation
+
+Gateway（core package）は何をしているか?
+
+開発者によるエンドポイント定義を基に`http.Handler`を生成する．
 
 （省略版）
 
 .code src/protocol-tranformation.go /^func /,/^}/
 
-HTTP RequestとしてProtoを受け与えられたStructにUnmarshalする．
-
-gRPC Requestを投げそのResponseをProtoにMarshalしてHTTP Responseを返す．
-
 * Protocol transformation
 
-他の機能
+他にも
 
 - gRPC error code とHTTP Status codeの変換（ref [[https://github.com/grpc-ecosystem/grpc-gateway][grpc-gateway]]）
 - Request Headerを基にJSONでのリクエストも受け付けるように by [[https://godoc.org/github.com/golang/protobuf/jsonpb][jsonpb]]
-- GoogleのAPI Designの[[https://cloud.google.com/apis/design/errors][Error]]を参考にした共通のエラーメッセージの定義
 
-* Request buffering
+などを実行している
 
-* Request buffering
+* Conclusion
 
-GLBやGo標準の[[https://golang.org/pkg/net/http/httputil/][ReverseProxy]]はRequest bufferingをしない（Nginxなどはdefaultでbufferingする）つまりRequestはサーバーに到達した瞬間にBackendに送られる．
+API gatewayとは何か?とその実装詳細について紹介した.
 
-インターネット越しのClientからAPI gatewayのリクエストは通信環境によって遅くなることは十分に起こりうる．API gatewayにRequest bufferingを持たせることで配下のMicroservicesがSlow Clientのことを考慮する必要がなくなる．Slow clientの問題かAPI gatewayとMicroservices間の問題かの切り分けも容易になる．
+他の機能の実装方法や移行方法など話したいことはたくさんあるがまた別の機会に！
 
-* Request buffering
+* We're hiring
 
-[[https://github.com/vulcand/oxy][vulcand/oxy]]をforkして実装した．
+- [[https://open.talentio.com/1/c/mercari/requisitions/detail/7877][Microservices Platform Team]]: GoによるAPI gatewayや共通サービス・ツールの開発やKubernetesを使った基盤の開発
+- [[https://open.talentio.com/1/c/mercari/requisitions/detail/5278][Microservices Development Team]]: GoによるMicroservicesの開発（Monolithからの移行）
 
-Forkした理由はGoの[[https://golang.org/pkg/net/http/httputil/][ReverseProxy]]とうまく動かないため（ReverseProxyがTransfer-EncodingとContent-Lengthヘッダーを消すのでoxyがResponse bodyを読めない...）
-
-動作
-
-- 基本はIn-memoryのBuffferにリクエストを保存
-- 一定値を超えたらFileに書き出す（GKEでSSD準備する努力とかもあったが...）
-- 全リクエストが到達したらBackendにリクエストを送りつける
-
-以上をMiddleware（Adapter）として実装した
-
-* まとめ
-
-話したりねえ！
-
-続きは[[https://mercari.connpass.com/event/91306/][mercari.go#1]]で
 
 * 参考
 
@@ -270,3 +321,9 @@ Forkした理由はGoの[[https://golang.org/pkg/net/http/httputil/][ReverseProx
 - [[https://docs.microsoft.com/en-us/azure/architecture/patterns/gateway-offloading][Gateway Offloading pattern]]
 - [[https://www.digitalocean.com/community/tutorials/understanding-nginx-http-proxying-load-balancing-buffering-and-caching][Understanding Nginx HTTP Proxying, Load Balancing, Buffering, and Caching]]
 - [[https://mauricio.github.io/golang-proxies/#/][Building a proxy server in Golang]]
+
+* Appendix:  DigitalOcean API gateway
+
+[[https://mauricio.github.io/golang-proxies/#/][Building a proxy server in Golang]]
+
+.code src/digitalocean.go /START OMIT/,/END OMIT/
