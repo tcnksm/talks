@@ -50,7 +50,7 @@ Monolithアーキテクチャにより高速なサービス開発をしてきた
 MicroservicesアーキテクチャにおけるAPI Gatewayの役割
 
 - クライアントからのリクエストを単一のEndpointで受けRoutingを行う
-- Internet facingのサービスが持つべき共通処理を代わりに行う
+- Internet facingのサービスが持つべき共通処理(*)を代わりに行う
 - MonolithへのリクエストをProxyし段階的なサービス分割を補助する
 
 (*)共通処理
@@ -179,7 +179,7 @@ API GatewayもGKE上で動かしている
 
 Core packageとそれを使った具体的な実装に分離した．
 
-- Regionや他サービスごとの実装を可能にするため
+- 他のRegionや他サービスごとの実装を可能にするため
 - 実装の責任範囲を明確に分離するため
 
 * Core as a package
@@ -307,7 +307,7 @@ Protoの定義から各言語のClientとServerの実装を生成する．
 
 * Protocol transformation
 
-SPI Gateway（core package）は何をしているか?
+API Gateway（core package）は何をしているか?
 
 開発者によるエンドポイント定義を基に`http.Handler`を生成する．
 
@@ -381,6 +381,45 @@ Route53の[[https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-r
 
 + 先月よりGateway配下で新規のMicroservicesも動き始めている!
 
+* Performance
+
+* Performance
+
+[[https://talks.godoc.org/github.com/davecheney/high-performance-go-workshop/high-performance-go-workshop.slide#95]["Readable means reliable"]] (Rob Pike)だが...
+
+Mercariの全リクエスト（ピーク時約56,000req/sec）を受けるためパフォーマンスには十分に注意を払う必要がある．
+
+パフォーマンス・チューニングで最も大切なのは「可視化」
+
+API Gatewayでは以下を行っている
+
+- Datadogによるメトリクスの可視化
+- Datadog APMによるDistributed Tracing
+
+さらに「可視化」するにはCPUレベルでのパフォーマンス・チューニングを行うにはProfilingが必要
+
+* Performance
+
+Goは標準で[[https://golang.org/pkg/net/http/pprof/][pprof]]によるCPUやMemory UsageのProfilingの仕組みが提供されている．
+
+が自分で「適切な負荷」を発生させる必要がある...
+
+Googleは「本番環境でProfiler」を動かしている（[[https://research.google.com/pubs/pub36575.html][Google-Wide Profiling: A Continuous Profiling Infrastructure for Data Centers]]）．つまり自分で負荷を発生させるのではなくユーザが実際に利用するエンドポイントでProfilingを行っている!
+
+-> [[https://cloudplatform.googleblog.com/2018/03/introducing-Stackdriver-APM-and-Stackdriver-Profiler-Distributed-tracing-debugging-and-profiling-for-your-performance-sensitive-applications.html][Stackdriver Profiler]]
+
+* Performance
+
+Stackdriver Profilerは以下のようにFramegraphを使いCPU・Memory usageレベルでどのFunctionにどれだけ時間がかかってるかを可視化できる！（+統計的な手法によりProfilingによるパフォーマンスの劣化も防いでいる）
+
+.image img/profiler.png 350 _
+
+[[https://deeeet.com/writing/2016/05/29/go-flame-graph/][GolangでFlame Graphを描く]]
+
+* Performance
+
+API gatewayではStackdriver Profilerを使い本番でProfilerを動かしCPUレベルでパフォーマンスの劣化問題を発見できるようにしている!
+
 * Conclusion
 
 API gatewayとは何か?とその実装思想と詳細，移行方法について紹介した.
@@ -399,6 +438,7 @@ API gatewayとは何か?とその実装思想と詳細，移行方法につい�
 - [[https://docs.microsoft.com/en-us/azure/architecture/patterns/gateway-offloading][Gateway Offloading pattern]]
 - [[https://www.digitalocean.com/community/tutorials/understanding-nginx-http-proxying-load-balancing-buffering-and-caching][Understanding Nginx HTTP Proxying, Load Balancing, Buffering, and Caching]]
 - [[https://mauricio.github.io/golang-proxies/#/][Building a proxy server in Golang]]
+
 
 * Appendix:  DigitalOcean API gateway
 
