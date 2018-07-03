@@ -22,18 +22,23 @@ Taichi Nakashima
 
 * tl;dr
 
-Mercariの全リクエストを受けるMicroservicesのためのAPI Gatewayについて紹介する
+Mercari Microservices化のために開発したAPI Gatewayについて紹介する．
 
 - API Gatewayとは何か?
 - API Gatewayの実装思想は?
-- API Gatewayの詳細実装は?
+- API Gatewayの機能の実装方法は?
 
-* Background
+* Background for Microservices
 
-- サービスの成長に伴う組織の拡大
-- Monolithの巨大化と複雑化
+Monolithアーキテクチャにより高速なサービス開発をしてきた一方でコードベースの巨大化により以下が問題になってきた
 
-Microservicesアーキテクチャへの移行によりスケーラブルな開発組織を目指す！
+- 変更による影響範囲の不明確化
+- テストの複雑化
+- On-boardingコストの増加
+- 障害のIsolation
+- ...
+
+今後さらなるサービスの拡大によって組織が成長しても「開発スピードを落とさない・むしろ上げる!」「個のパフォーマンスを最大限に高める」ためにMicroservicesアーキテクチャへの移行を始めた
 
 * API gateway for Microservices?
 
@@ -59,7 +64,7 @@ MicroservicesアーキテクチャにおけるAPI Gatewayの役割
 
 * API gateway for Microservices?
 
-MonolithへのリクエストをProxyし段階的なサービス分割を補助する
+MonolithへのリクエストをProxyし段階的なサービス分割を補助する．
 
 .image img/gateway-routing.png 500 _
 
@@ -95,6 +100,21 @@ MercariのAPI gatewayが満たすべきこと
 
 * Implementation
 
+* Infrastructure
+
+.image img/infra.png 550 _
+
+* Infrastructure
+
+Microservicesの基盤はCloud（GCP）上に構築してる
+
+- 各MicroservicesはコンテナとしてGoogle Kubernetes Engine（GKE）で動かす
+- 各MicroservicesのDBはManaged Service（CloudSQLやSpanner）を利用する
+
+API GatewayもGKE上で動かしている
+
+詳しくは[[https://speakerdeck.com/tcnksm/microservices-on-gke-at-mercari][Microservices on GKE at Mercari]]
+
 * Technical stack
 
 - [[https://cloud.google.com/load-balancing/][Google Load Balancer (GLB)]]
@@ -102,18 +122,19 @@ MercariのAPI gatewayが満たすべきこと
 
 * Google Load Balancer (GLB)
 
-*Why?*（そもそも）Microservicesの基盤はCloud（GCP）上に構築してる．CloudサービスでできることはCloudサービスでやる（詳しくは[[https://speakerdeck.com/tcnksm/microservices-on-gke-at-mercari][Microservices on GKE at Mercari]]）
-
-以下を担う部分として利用
+現在は以下を担う部分として利用している
 
 - SSL termination
 - DDoS protection
 
-+将来的には[[https://cloud.google.com/armor/][Cloud Armor]]を利用したセキュリティの強化も検討している
+将来的には以下での利用を検討している
+
+- [[https://cloud.google.com/armor/][Cloud Armor]]を利用したセキュリティの強化
+- [[https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress][Multi Cluster Ingress]]を利用した複数RegionへのCluster分散によるHAの確保
 
 * Go
 
-*Why?* Goは今後Mercariのメインの言語になっていく．Goさえ知っていれば誰でもAPI gatewayを拡張できるようにしたい
+*Why?* Goは今後Mercariのメインの言語になっていく．Goさえ知っていれば誰でもAPI gatewayを拡張できるようにしたい．
 
 以下の機能を実装
 
@@ -128,7 +149,7 @@ MercariのAPI gatewayが満たすべきこと
 
 * Only Go
 
-[[https://deeeet.com/writing/2018/05/22/service-mesh/][Service mesh]]（Istio）の将来的な導入を検討していたためNgnixなどの依存は極力減らした
+[[https://deeeet.com/writing/2018/05/22/service-mesh/][Service mesh]]（Istio）の将来的な導入を考慮しNgnixなどの依存は極力減らした．
 
 * Design
 
@@ -143,7 +164,7 @@ MercariのAPI gatewayが満たすべきこと
 
 「Goさえ知っていれば誰でもAPI Gatewayを拡張できる」
 
-なるべく標準ライブラリや標準の作法を組み合わせて実装する．例えばサーバー実装は`net/http`のみを使う，テストは`testing`でTable drivenを使う，Middlewareパターン（後述）を使うなど
+なるべく標準ライブラリや標準の作法を組み合わせて実装する．例えばサーバー実装は`net/http`のみを使う，テストは`testing`でTable drivenを使う，Middlewareパターン（後述）を使うなど．
 
 * Gopher friendly
 
@@ -155,7 +176,7 @@ MercariのAPI gatewayが満たすべきこと
 
 * Core as a package
 
-Core packageとそれを使った具体的な実装に分離した
+Core packageとそれを使った具体的な実装に分離した．
 
 - Regionや他サービスごとの実装を可能にするため
 - 実装の責任範囲を明確に分離するため
@@ -187,7 +208,7 @@ Core packageを使った実装には最小限のことしかできないよう�
 
 * Middleware driven
 
-Gatewayでの共通処理は全て[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）で実装している
+Gatewayでの共通処理は全て[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）で実装している．
 
 e.g., アクセスログを記録するMiddleware
 
@@ -276,7 +297,7 @@ Protoの定義から各言語のClientとServerの実装を生成する．
 
 .code src/gateway-definition.go /START OMIT/,/END OMIT/
 
-以下のことができるようになる．
+以下のことができるようになる
 
 - Clientは`/services/echo/say`に`SayRequest`をHTTPで投げる
 - Gatewayは`SayRequest`を`Say`メソッドでgRPCでEcho serviceに投げる
@@ -299,11 +320,11 @@ Gateway（core package）は何をしているか?
 - gRPC error code とHTTP Status codeの変換（ref [[https://github.com/grpc-ecosystem/grpc-gateway][grpc-gateway]]）
 - Request Headerを基にJSONでのリクエストも受け付けるように by [[https://godoc.org/github.com/golang/protobuf/jsonpb][jsonpb]]
 
-などを実行している
+などを実行している．
 
 * Conclusion
 
-API gatewayとは何か?とその実装詳細について紹介した.
+API gatewayとは何か?とその実装思想と詳細について紹介した.
 
 他の機能の実装方法や移行方法など話したいことはたくさんあるがまた別の機会に！
 
