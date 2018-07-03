@@ -184,7 +184,7 @@ Core packageとそれを使った具体的な実装に分離した．
 
 * Core as a package
 
-Regionや他サービスごとの実装を可能にする．
+他のRegionや他サービスごとの実装を可能にする．
 
 .image img/api-gateway-package.png 300 _
 
@@ -228,7 +228,7 @@ Coreは以下のようなMiddlewareをもつ
 - `withDDTrace` - [[https://www.datadoghq.com/][Datadog]]による分散TracingのSpanの生成 (Observability)
 - `withRecover` - panicのrecover+[[https://sentry.io][Sentry]]への通知
 
-Regionやサービス特有の機能を実装して使うこともできる．
+Regionやサービス特有の機能を実装して使うこともできるようにしている．
 
 * Implementation details
 
@@ -396,7 +396,7 @@ API Gatewayでは以下を行っている
 - Datadogによるメトリクスの可視化
 - Datadog APMによるDistributed Tracing
 
-さらに「可視化」するにはCPUレベルでのパフォーマンス・チューニングを行うにはProfilingが必要
+さらに「可視化」してパフォーマンス・チューニングするにはProfilingが必要
 
 * Performance
 
@@ -410,7 +410,7 @@ Googleは「本番環境でProfiler」を動かしている（[[https://research
 
 * Performance
 
-Stackdriver Profilerは以下のようにFramegraphを使いCPU・Memory usageレベルでどのFunctionにどれだけ時間がかかってるかを可視化できる！（+統計的な手法によりProfilingによるパフォーマンスの劣化も防いでいる）
+Stackdriver Profilerは以下のようにFramegraphを使いCPUレベルでどのFunctionにどれだけ時間がかかってるかを可視化できる！（+統計的な手法によりProfilingによるパフォーマンスの劣化も防いでいる）
 
 .image img/profiler.png 350 _
 
