@@ -8,11 +8,11 @@ import (
 
 func GRPCHandler(name string, conn *grpc.ClientConn, reqMsg, respMsg proto.Message) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		unmarshalRequest(r, reqMsg) // リクエストを与えられたリクエストにUnmarshalする
+		unmarshalRequest(r, reqMsg) // リクエストを与えられたリクエスト型にUnmarshalする
 
 		conn.Invoke(r.Context(), name, reqMsg, respMsg) // gRPCリクエストを実行する
 
-		buf, _ := proto.Marshal(respMsg) // 与えられたレスポンスにMarshalする
+		buf, _ := proto.Marshal(respMsg) // レスポンスをProtobufferにMarshalする
 
 		w.Write(buf) // HTTPレスポンスを書き込む
 	})

@@ -25,8 +25,9 @@ Taichi Nakashima
 Mercari Microservices化のために開発したAPI Gatewayについて紹介する．
 
 - API Gatewayとは何か?
-- API Gatewayの実装思想は?
+- API Gatewayの設計思想は?
 - API Gatewayの機能の実装方法は?
+- API Gatewayの移行方法は?
 
 * Background for Microservices
 
@@ -49,7 +50,7 @@ Monolithアーキテクチャにより高速なサービス開発をしてきた
 MicroservicesアーキテクチャにおけるAPI Gatewayの役割
 
 - クライアントからのリクエストを単一のEndpointで受けRoutingを行う
-- （Internet facingの）各Microservicesが持つべき共通処理(*)をOffloadする
+- Internet facingのサービスが持つべき共通処理を代わりに行う
 - MonolithへのリクエストをProxyし段階的なサービス分割を補助する
 
 (*)共通処理
@@ -74,7 +75,7 @@ MercariのAPI gatewayが満たすべきこと
 
 - High performance（ピーク時約56,000req/sec）
 - 内製サービス（e.g., Authentication service）と連携する
-- Microservices間の通信にgRPCを利用する（Protocol transformation）
+- Protocol Transformにより内部通信にgRPCを利用する（後述）
 - 日本だけではなく他のRegionや他のサービスでも利用できるようにする
 
 * VS.
@@ -208,7 +209,7 @@ Core packageを使った実装には最小限のことしかできないよう�
 
 * Middleware driven
 
-Gatewayでの共通処理は全て[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）で実装している．
+API Gatewayでの共通処理は全て[[https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81][Middleware]]（Adapter）で実装している．
 
 e.g., アクセスログを記録するMiddleware
 
@@ -236,6 +237,7 @@ Regionやサービス特有の機能を実装して使うこともできる．
 以下の代表的な機能の実装の詳細を紹介する
 
 - Protocol transformation (HTTP to gRPC)
+- Request buffering
 
 * Protocol transformation
 
@@ -271,7 +273,7 @@ API Gatewayがprotocolの変換（HTTP to gRPC）を担う
 開発者がやること
 
 - サービスのインターフェースをProtocol bufferで定義する
-- エンドポイントの定義をGatewayの実装に追加する
+- エンドポイントの定義をAPI Gatewayの実装に追加する
 
 * Protocol transformation
 
@@ -293,19 +295,19 @@ Protoの定義から各言語のClientとServerの実装を生成する．
 
 * Protocol transformation
 
-エンドポイントの定義をGatewayの実装に追加する（e.g., Echo service）
+エンドポイントの定義をAPI Gatewayの実装に追加する（e.g., Echo service）
 
 .code src/gateway-definition.go /START OMIT/,/END OMIT/
 
 以下のことができるようになる
 
 - Clientは`/services/echo/say`に`SayRequest`をHTTPで投げる
-- Gatewayは`SayRequest`を`Say`メソッドでgRPCでEcho serviceに投げる
-- GatewayはEcho serviceから`SayResponse`を受けそれをClientにHTTPで返す
+- API Gatewayは`SayRequest`を`Say`メソッドでgRPCでEcho serviceに投げる
+- API GatewayはEcho serviceから`SayResponse`を受けそれをClientにHTTPで返す
 
 * Protocol transformation
 
-Gateway（core package）は何をしているか?
+SPI Gateway（core package）は何をしているか?
 
 開発者によるエンドポイント定義を基に`http.Handler`を生成する．
 
@@ -315,18 +317,73 @@ Gateway（core package）は何をしているか?
 
 * Protocol transformation
 
-他にも
+他にも以下の機能をもつ
 
 - gRPC error code とHTTP Status codeの変換（ref [[https://github.com/grpc-ecosystem/grpc-gateway][grpc-gateway]]）
 - Request Headerを基にJSONでのリクエストも受け付けるように by [[https://godoc.org/github.com/golang/protobuf/jsonpb][jsonpb]]
 
-などを実行している．
+* Request buffering
+
+* Request buffering
+
+*Why?*: Clientからのインターネット越しのリクエストは通信環境によって遅くなることは十分に起こりうる
+
+API gatewayにRequest bufferingを持たせることで
+
+- 配下のMicroservicesがSlow Clientのことを考慮する必要がなくなる
+- Slow clientの問題かAPI gatewayとMicroservices間の問題かの切り分けが容易になる
+
+GLBはRequest bufferingをしないので自分で実装する必要がある...!
+
+* Request buffering
+
+[[https://github.com/vulcand/oxy][vulcand/oxy]]を利用した．
+
+`vulcand/oxy`はRequest bufferingだけでなくRate limitなど標準パッケージが提供していない便利機能を提供している．
+
+Goの[[https://golang.org/pkg/net/http/httputil/][ReverseProxy]]とうまく動かない（ReverseProxyがTransfer-EncodingとContent-Lengthヘッダーを消すのでoxyがResponse bodyを読めない...）+Package内でのObservabilityを高めるためにForkして実装した．
+ 
+動作
+ 
+- 基本はIn-memoryのBuffferにリクエストを保存する
+- 一定値を超えたらDiskに書き出す(*)
+- 全リクエストが到達したらまとめてBackendにリクエストを送りつける
+
+(*) GKEにSSDを準備する必要があった
+
+* Migration
+
+* Migration
+
+（Clientの変更を避けるため）DNSの切り替えによりClientから直接リクエストをMonolithに投げていたのをAPI Gateway（on GKE）経由に移行した．
+
+.image img/migration.png 300 _
+
+リクエスト経路が変わるだけだが大きな変更（Gatewayにバグがあるかもしれない）
+
+お客様への影響を最小限に抑えるために段階的なリリースを行った．
+
+* Migration
+
+APIのドメインはAWSのRoute53と[[https://www.rubydoc.info/gems/roadworker/][roadworker]]により管理している．
+
+Route53の[[https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-values-weighted.html#rrsets-values-weighted-weight][Weighted Records]]の機能を使いDNSレコードの返答に「MonolithのIP」と「API gatewayのIP」でそれぞれ重みをつけるようにしその重みを変更することで徐々にリクエストの流し先を変更した．
+
+* Migration
+
+（例）roadworkerの設定．「MonolithのIP」: 「API gatewayのIP」= 255:1
+
+.code src/dns.rb
+
+* Migration
+
+パフォーマンス修正をしながら約1ヶ月以上かけてMigrationを完了し現在は100%のリクエストがAPI Gateway経由になっている．
+
++ 先月よりGateway配下で新規のMicroservicesも動き始めている!
 
 * Conclusion
 
-API gatewayとは何か?とその実装思想と詳細について紹介した.
-
-他の機能の実装方法や移行方法など話したいことはたくさんあるがまた別の機会に！
+API gatewayとは何か?とその実装思想と詳細，移行方法について紹介した.
 
 * We're hiring
 
